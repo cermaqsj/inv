@@ -34,7 +34,7 @@
 
     <nav>
         <div style="display:flex; align-items:center; gap:10px;">
-            <img src="Q.png" alt="Logo" class="nav-logo">
+            <img src="Cermaq_logo.png" alt="Logo" class="nav-logo">
             <h1>CERMAQ</h1>
         </div>
         <div class="status-pill">
@@ -44,9 +44,7 @@
         <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()">
             <span class="material-icons-round">admin_panel_settings</span>
         </button>
-        <button class="icon-btn" id="btn-install" style="display: none;" onclick="installPWA()">
-            <span class="material-icons-round">download</span>
-        </button>
+        <!-- Install button removed from header -->
     </nav>
 
     <main>
@@ -91,7 +89,16 @@
         <div class="admin-only" style="margin-top: 1rem;">
             <!-- Admin content -->
         </div>
+
+        <!-- Install App Section (Universally Visible at Bottom) -->
+        <div id="install-container" style="margin-top: 2rem; text-align: center; display: none;">
+            <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente?</p>
+            <button class="btn btn-primary" onclick="installPWA()"
+                style="width: 100%; background: var(--text); box-shadow: none;">
+                <span class="material-icons-round">download_for_offline</span> Instalar App
+            </button>
         </div>
+
     </main>
 
     <!-- Toast Container -->

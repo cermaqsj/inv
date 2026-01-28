@@ -671,6 +671,9 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+    // Show universally at the bottom
+    const installContainer = document.getElementById('install-container');
+    if (installContainer) installContainer.style.display = 'block';
 });
 
 async function installPWA() {
@@ -678,6 +681,6 @@ async function installPWA() {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         deferredPrompt = null;
-        document.getElementById('btn-install').style.display = 'none';
+        document.getElementById('install-container').style.display = 'none';
     }
 }
