@@ -4,7 +4,7 @@ const ASSETS = [
     './index.html',
     './style.css',
     './app.js',
-    './Cermaq_logo.png',
+    './Cermaq_logo2.png',
     './Q.png',
     './manifest.json',
     'https://unpkg.com/html5-qrcode',

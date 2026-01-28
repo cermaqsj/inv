@@ -788,5 +788,13 @@ async function installPWA() {
         const { outcome } = await deferredPrompt.userChoice;
         deferredPrompt = null;
         document.getElementById('install-container').style.display = 'none';
+    } else {
+        // Fallback or Help
+        const msg = document.getElementById('install-msg');
+        if (msg) {
+            msg.style.display = 'block';
+            msg.innerHTML = "Tu navegador no permite la instalación automática. <br> Busca <b>'Instalar App'</b> o <b>'Agregar a Inicio'</b> en el menú del navegador.";
+        }
+        showToast('Instala desde el menú del navegador', 'info');
     }
 }
