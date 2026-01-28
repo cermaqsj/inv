@@ -5,7 +5,7 @@ const https = require('https');
 // --- CONFIGURATION ---
 // Paste your full Item List here if you want to run offline, 
 // OR simpler: we fetch from your App Script URL to get the live list.
-const API_URL = 'https://script.google.com/macros/s/AKfycbzpgUkMhdDmLSaejzg_Faql7j-fpojIx0mx98w1sQzl9Wdbfjx1YRdVZij9VLnF5sCK/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz2Uk4rAGzb5S2x1VPS-L6Mf8kcd6MUOuDOz-YwDXgpVTZvE7Veqeku-60tMQXZN4tW/exec';
 const OUTPUT_DIR = path.join(__dirname, 'web', 'qr_codes');
 
 // Create directory if not exists
