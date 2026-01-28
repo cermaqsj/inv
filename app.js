@@ -4,7 +4,7 @@
 const CONFIG = {
     // Default API URL from user
     // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbz2Uk4rAGzb5S2x1VPS-L6Mf8kcd6MUOuDOz-YwDXgpVTZvE7Veqeku-60tMQXZN4tW/exec',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbxfpcRoJLxWyu3LlRRkNHysojwhQNURyB3oP7nFlmZPkErAo9lCYPO9VXpxbcd2Exel/exec',
     STORAGE_KEY: 'cermaq_inventory_url',
 };
 
@@ -228,7 +228,10 @@ function addToCart(type) {
 
     const qty = parseInt(document.getElementById('qty-input').value);
     const id = currentProduct.id;
-    const name = currentProduct.nombre;
+    // Get name from input (might be edited by admin) or fallback
+    const nameInput = document.getElementById('p-name');
+    const name = nameInput ? nameInput.value : currentProduct.nombre;
+
     const comment = document.getElementById('tx-comment').value;
     const price = document.getElementById('tx-price').value;
 
@@ -332,8 +335,10 @@ async function processCart() {
     const userInput = document.getElementById('input-responsable');
     const user = userInput ? userInput.value.trim() : "Anonimo";
 
-    if (userInput && user === "") {
-        showToast("Debes ingresar quién retira/ingresa", "error");
+    if (userInput && user.length < 3) {
+        showToast("Es obligatorio ingresar un nombre válido (mín. 3 letras)", "error");
+        userInput.classList.add('error-pulse');
+        setTimeout(() => userInput.classList.remove('error-pulse'), 500);
         userInput.focus();
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -354,6 +359,7 @@ async function processCart() {
                 id: item.id,
                 quantity: item.qty,
                 user: user, // Sent here
+                nombre: item.name, // Send name in case of update
                 comment: item.comment || "",
                 price: item.price || ""
             });
@@ -434,6 +440,44 @@ async function handleCreate() {
     } catch (e) {
         showToast('Error al crear producto', 'error');
     }
+
+    async function saveProductName() {
+        if (!currentProduct) return;
+
+        const newName = document.getElementById('p-name').value.trim();
+        if (newName.length < 3) {
+            showToast("Nombre muy corto", "error");
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-name');
+        btn.innerHTML = '<span class="material-icons-round spin">sync</span>';
+        btn.disabled = true;
+
+        try {
+            const result = await sendTransaction({
+                action: 'UPDATE_NAME',
+                id: currentProduct.id,
+                nombre: newName,
+                user: "WebAdmin"
+            });
+
+            if (result.status === 'success') {
+                showToast('Nombre actualizado', 'success');
+                currentProduct.nombre = newName;
+                checkConnection();
+            } else {
+                showToast('Error al guardar', 'error');
+            }
+        } catch (e) {
+            showToast('Error de conexión', 'error');
+        }
+
+        // Restore button
+        btn.innerHTML = '<span class="material-icons-round">save</span>';
+        btn.disabled = false;
+    }
+
 }
 
 /**
@@ -728,7 +772,14 @@ async function openProductModal(idOrData) {
     currentProduct = product;
 
     // UI
-    document.getElementById('p-name').innerText = product.nombre;
+    const nameInput = document.getElementById('p-name');
+    nameInput.value = product.nombre;
+    nameInput.disabled = !isAdmin;
+
+    // Show save button ONLY for admin
+    const saveBtn = document.getElementById('btn-save-name');
+    if (saveBtn) saveBtn.style.display = isAdmin ? 'flex' : 'none';
+
     document.getElementById('p-id').innerText = product.id;
     document.getElementById('p-stock').innerText = product.stock;
 

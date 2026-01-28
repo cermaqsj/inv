@@ -1,5 +1,5 @@
 
-// CONFIGURACIÓN DE COLUMNAS (Basado en tu archivo)
+// CONFIGURACIÓN DE COLUMNAS
 const KOL = {
   ID: 0,          // Columna A: Nº ARTICULO
   NOMBRE: 1,      // Columna B: DESCRIPCION
@@ -32,6 +32,8 @@ function doPost(e) {
       return agregarProducto(params);
     } else if (accion === "GET_HISTORY") {
       return obtenerHistorial(params);
+    } else if (accion === "UPDATE_NAME") {
+      return actualizarNombre(params);
     } else {
       return respuestaJSON({ error: "Acción no válida" });
     }
@@ -104,6 +106,12 @@ function procesarMovimiento(datos) {
   
   // Guardamos el nuevo stock
   celdaStock.setValue(nuevoStock);
+
+  // ACTUALIZAR NOMBRE (Si se envió y es diferente)
+  if (datos.nombre) {
+     const celdaNombre = sheet.getRange(filaEncontrada, KOL.NOMBRE + 1);
+     celdaNombre.setValue(datos.nombre);
+  }
   
   // Registramos en el Historial
   if (logSheet) {
@@ -301,4 +309,27 @@ function obtenerHistorial(params) {
     }
 
     return respuestaJSON(historial);
+}
+
+function actualizarNombre(datos) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_INVENTARIO);
+  const data = sheet.getDataRange().getValues();
+  const idBusqueda = String(datos.id);
+  
+  let filaEncontrada = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][KOL.ID]) === idBusqueda) {
+      filaEncontrada = i + 1;
+      break;
+    }
+  }
+
+  if (filaEncontrada === -1) {
+    return respuestaJSON({ status: "error", message: "Producto no encontrado" });
+  }
+
+  // Update Name
+  sheet.getRange(filaEncontrada, KOL.NOMBRE + 1).setValue(datos.nombre);
+  
+  return respuestaJSON({ status: "success", message: "Nombre actualizado" });
 }

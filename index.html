@@ -114,7 +114,13 @@
     <div class="modal-backdrop" id="modal-product">
         <div class="modal-content">
             <div class="product-header">
-                <h2 id="p-name">Cargando...</h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="text" id="p-name" class="product-name-input" value="Cargando..." disabled>
+                    <button class="icon-btn admin-only" id="btn-save-name" onclick="saveProductName()"
+                        style="display:none; color:var(--primary);">
+                        <span class="material-icons-round">save</span>
+                    </button>
+                </div>
                 <div class="product-meta">ID: <span id="p-id">-</span></div>
             </div>
 
@@ -232,33 +238,13 @@
             <div id="cart-items-container" class="cart-list">
                 <!-- User Attribution -->
                 <div class="input-group" style="margin-bottom: 1rem; padding: 0 1rem;">
-                    <label class="input-label">Solicitante / Responsable</label>
+                    <label class="input-label">Solicitante / Responsable <span
+                            style="color:var(--danger)">*</span></label>
                     <input type="text" id="input-responsable" class="input-field"
                         placeholder="Nombre de quien retira/ingresa">
                 </div>
 
-                <!-- History Modal -->
-                <div class="modal-backdrop" id="modal-history">
-                    <div class="modal-content" style="height: 90vh;">
-                        <div class="product-header"
-                            style="display: flex; justify-content: space-between; align-items: center;">
-                            <h2>Historial</h2>
-                            <button class="icon-btn" onclick="closeModal()"><span
-                                    class="material-icons-round">close</span></button>
-                        </div>
 
-                        <div class="input-group" style="margin-top: 1rem;">
-                            <button class="btn btn-primary" onclick="loadHistory()" style="width:100%">
-                                <span class="material-icons-round">refresh</span> Actualizar
-                            </button>
-                        </div>
-
-                        <div id="history-list" class="cart-list" style="margin-top: 1rem;">
-                            <!-- Logs injected here -->
-                            <div class="history-loading">Carga el historial para ver registros...</div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Items will be injected here -->
                 <div style="text-align: center; padding: 2rem; color: var(--text-light);">
@@ -267,9 +253,30 @@
             </div>
 
             <div class="cart-footer">
-                <button class="btn btn-primary" onclick="processCart()" style="width: 100%;">
+                <button class="btn btn-success" onclick="processCart()" style="width: 100%;">
                     <span class="material-icons-round">send</span> CONFIRMAR TODO
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-backdrop" id="modal-history">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="product-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Historial</h2>
+                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
+            </div>
+
+            <div class="input-group" style="margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="loadHistory()" style="width:100%">
+                    <span class="material-icons-round">refresh</span> Actualizar
+                </button>
+            </div>
+
+            <div id="history-list" class="cart-list" style="margin-top: 1rem;">
+                <!-- Logs injected here -->
+                <div class="history-loading">Carga el historial para ver registros...</div>
             </div>
         </div>
     </div>
