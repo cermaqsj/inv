@@ -30,6 +30,8 @@ function doPost(e) {
       return procesarMovimiento(params);
     } else if (accion === "ADD") {
       return agregarProducto(params);
+    } else if (accion === "GET_HISTORY") {
+      return obtenerHistorial(params);
     } else {
       return respuestaJSON({ error: "Acción no válida" });
     }
@@ -266,4 +268,37 @@ function CONFIGURAR_SISTEMA() {
   }
   
   SpreadsheetApp.getUi().alert("¡Sistema Configurado! Ahora realiza la Implantación como Aplicación Web.");
+}
+
+function obtenerHistorial(params) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(HOJA_LOGS);
+
+    if (!sheet) return respuestaJSON([]);
+
+    // Obtener todos los datos
+    const data = sheet.getDataRange().getValues();
+    // Encabezados en fila 0
+
+    const historial = [];
+    const limit = 50; // Últimos 50 movimientos
+
+    // Recorrer de ABAJO hacia ARRIBA (los más recientes al final)
+    for (let i = data.length - 1; i >= 1; i--) {
+        if (historial.length >= limit) break;
+
+        const row = data[i];
+        // Formato FECHA | ACCION | ID | NOMBRE | CANTIDAD | STOCK | USUARIO | COMENTARIO
+        historial.push({
+            fecha: row[0],
+            accion: row[1],
+            id: row[2],
+            nombre: row[3],
+            cantidad: row[4],
+            usuario: row[6], // Col G
+            comentario: row[7] || "" // Col H
+        });
+    }
+
+    return respuestaJSON(historial);
 }

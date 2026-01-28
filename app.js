@@ -276,6 +276,13 @@ function updatePendingBadge(count) {
 function openCartModal() {
     document.getElementById('modal-cart').classList.add('active');
     renderCart();
+
+    // Auto-fill user
+    const lastUser = localStorage.getItem('last_user_name');
+    if (lastUser) {
+        const input = document.getElementById('input-responsable');
+        if (input) input.value = lastUser;
+    }
 }
 
 function renderCart() {
@@ -320,6 +327,21 @@ async function processCart() {
     btn.innerHTML = '<span class="material-icons-round spin">sync</span> Procesando...';
     btn.disabled = true;
 
+    // Validation: User Name
+    const userInput = document.getElementById('input-responsable');
+    const user = userInput ? userInput.value.trim() : "Anonimo";
+
+    if (userInput && user === "") {
+        showToast("Debes ingresar quién retira/ingresa", "error");
+        userInput.focus();
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        return;
+    }
+
+    // Save for next time
+    localStorage.setItem('last_user_name', user);
+
     let successCount = 0;
     let errors = [];
 
@@ -330,7 +352,7 @@ async function processCart() {
                 action: item.type,
                 id: item.id,
                 quantity: item.qty,
-                user: "WebUser",
+                user: user, // Sent here
                 comment: item.comment || "",
                 price: item.price || ""
             });
@@ -796,5 +818,66 @@ async function installPWA() {
             msg.innerHTML = "Tu navegador no permite la instalación automática. <br> Busca <b>'Instalar App'</b> o <b>'Agregar a Inicio'</b> en el menú del navegador.";
         }
         showToast('Instala desde el menú del navegador', 'info');
+    }
+}
+
+/**
+ * HISTORY LOGIC
+ */
+function openHistoryModal() {
+    document.getElementById('modal-history').classList.add('active');
+    loadHistory();
+}
+
+async function loadHistory() {
+    const container = document.getElementById('history-list');
+    container.innerHTML = '<div style="text-align:center; padding:20px;">Cargando...</div>';
+
+    try {
+        // We reuse sendTransaction logic effectively or just fetch directly
+        // Since custom GET is needed, let's use fetch directly to avoid queue logic usually
+        // Actually, we can just use POST with action GET_HISTORY as defined in Code.gs, 
+        // OR standard GET parameters. 
+        // Based on Code_gs we implemented: doPost handles GET_HISTORY. 
+
+        const response = await fetch(getApiUrl(), {
+            method: 'POST',
+            body: JSON.stringify({ action: "GET_HISTORY" })
+        });
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error al cargar datos</div>';
+            return;
+        }
+
+        if (data.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px;">No hay movimientos recientes.</div>';
+            return;
+        }
+
+        container.innerHTML = data.map(row => {
+            const dateObj = new Date(row.fecha);
+            const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            return `
+            <div class="cart-item" style="flex-direction:column; align-items:flex-start; gap:5px;">
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <small style="color:#666">${dateStr}</small>
+                    <span class="tag ${row.accion === 'IN' ? 'in' : 'out'}">${row.accion}</span>
+                </div>
+                <div>
+                     <strong>${row.nombre}</strong> <br>
+                     <span style="font-size:0.9em">${row.cantidad} unid. | <b>${row.usuario}</b></span>
+                </div>
+                ${row.comentario ? `<div style="font-size:0.85em; color:#555; font-style:italic; background:#f0f0f0; padding:4px; width:100%; border-radius:4px;">"${row.comentario}"</div>` : ''}
+            </div>
+            `;
+        }).join('');
+
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error de conexión</div>';
     }
 }
