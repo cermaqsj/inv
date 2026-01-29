@@ -235,17 +235,14 @@
             </div>
             <p class="product-meta">Revisa los ítems antes de confirmar.</p>
 
+            <!-- User Attribution (Fixed: Moved outside dynamic list) -->
+            <div class="input-group" style="margin-bottom: 1rem; padding: 0 1rem;">
+                <label class="input-label">Solicitante / Responsable <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="input-responsable" class="input-field"
+                    placeholder="Nombre de quien retira/ingresa">
+            </div>
+
             <div id="cart-items-container" class="cart-list">
-                <!-- User Attribution -->
-                <div class="input-group" style="margin-bottom: 1rem; padding: 0 1rem;">
-                    <label class="input-label">Solicitante / Responsable <span
-                            style="color:var(--danger)">*</span></label>
-                    <input type="text" id="input-responsable" class="input-field"
-                        placeholder="Nombre de quien retira/ingresa">
-                </div>
-
-
-
                 <!-- Items will be injected here -->
                 <div style="text-align: center; padding: 2rem; color: var(--text-light);">
                     Tu lista está vacía.
@@ -253,7 +250,7 @@
             </div>
 
             <div class="cart-footer">
-                <button class="btn btn-success" onclick="processCart()" style="width: 100%;">
+                <button id="btn-confirm-cart" class="btn btn-success" onclick="processCart()" style="width: 100%;">
                     <span class="material-icons-round">send</span> CONFIRMAR TODO
                 </button>
             </div>

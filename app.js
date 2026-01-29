@@ -331,7 +331,7 @@ function removeFromCart(index) {
 async function processCart() {
     if (cart.length === 0) return;
 
-    const btn = document.querySelector('#modal-cart .btn-primary');
+    const btn = document.getElementById('btn-confirm-cart');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<span class="material-icons-round spin">sync</span> Procesando...';
     btn.disabled = true;
