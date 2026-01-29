@@ -846,19 +846,33 @@ function handleSearch() {
             </div>
         `).join('');
         container.style.display = 'block';
-    } else {
         container.style.display = 'none';
     }
 }
 
-// Install PWA
+// PWA Install Logic
 let deferredPrompt;
+
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // Show universally at the bottom
-    const installContainer = document.getElementById('install-container');
-    if (installContainer) installContainer.style.display = 'block';
+
+    // Only show if NOT standalone
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (!isStandalone) {
+        const installContainer = document.getElementById('install-container');
+        if (installContainer) installContainer.style.display = 'block';
+    }
+});
+
+// Check on load too (for iOS or if event fired early)
+document.addEventListener('DOMContentLoaded', () => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) {
+        const installContainer = document.getElementById('install-container');
+        if (installContainer) installContainer.style.display = 'none';
+        console.log("Running in standalone mode");
+    }
 });
 
 async function installPWA() {
