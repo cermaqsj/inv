@@ -1,0 +1,32 @@
+# Credenciales y archivos sensibles
+api credencial/
+*.key
+*.pem
+*.env
+
+# Backups
+Backup_*/
+*.zip
+
+# Archivos temporales
+*.tmp
+*.temp
+~$*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (si se usan en el futuro)
+node_modules/
+package-lock.json
