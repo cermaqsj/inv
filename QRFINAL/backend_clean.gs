@@ -210,4 +210,3 @@ function setup() {
   SCRIPT_PROP.setProperty("ADMIN_PASS", "mantencioncermaq");
   Logger.log("Setup Completo");
 }
-
