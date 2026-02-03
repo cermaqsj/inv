@@ -1,14 +1,14 @@
-const CACHE_NAME = 'cermaq-bodega-v4-offline';
+const CACHE_NAME = 'cermaq-bodega-v5.5-ultra';
 const ASSETS = [
     './',
     './index.html',
     './style.css',
     './app.js',
-    './html5-qrcode.min.js',
+    './products.js',
     './Cermaq_logo2.png',
     './Q.png',
     './manifest.json',
-    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+    'https://unpkg.com/html5-qrcode',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap',
     'https://fonts.googleapis.com/icon?family=Material+Icons+Round'
