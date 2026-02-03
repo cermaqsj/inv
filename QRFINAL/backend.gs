@@ -60,11 +60,12 @@ function getInventario() {
     // Filter empty IDs
     if (!row[0]) continue;
     
+    // SCHEMA: 0=ID, 1=Nombre, 2=Stock, 3=Categoria
     var item = {
       id: String(row[0]),
       nombre: String(row[1]),
-      stock: parseInt(row[3]) || 0,
-      categoria: String(row[4]) || ""
+      stock: parseInt(row[2]) || 0, // FIXED: Index 2
+      categoria: String(row[3]) || "" // FIXED: Index 3
     };
     inventory.push(item);
   }
@@ -99,7 +100,7 @@ function registrarMovimiento(data) {
   for (var i = 1; i < invData.length; i++) {
     if (String(invData[i][0]) === idArticulo) {
       rowIndex = i + 1; 
-      currentStock = parseInt(invData[i][3]) || 0; 
+      currentStock = parseInt(invData[i][2]) || 0; // FIXED: Index 2
       nombreArticulo = invData[i][1];
       break;
     }
@@ -111,11 +112,9 @@ function registrarMovimiento(data) {
   
   // Update Stock
   var nuevoStock = currentStock + cantidadFinal;
-  if (nuevoStock < 0 && data.action === "OUT") {
-     // Optional: Block negative stock? For now allow it or warn.
-  }
   
-  sheetInv.getRange(rowIndex, 4).setValue(nuevoStock);
+  // WRITING TO COLUMN 3 (Stock)
+  sheetInv.getRange(rowIndex, 3).setValue(nuevoStock); // FIXED: Column 3
   
   // Log
   sheetMov.appendRow([
@@ -152,15 +151,12 @@ function crearProducto(data) {
   }
   
   // Append
-  // Structure: ID, Nombre, Uni, Stock, Categoria, Precio, Total
+  // Structure: ID, Nombre, Stock, Categoria
   sheet.appendRow([
     id,
     data.nombre,
-    "UN",
     parseInt(data.stock) || 0,
-    "GENERADO", // Categoria default
-    0,
-    0
+    "GENERADO" // Categoria default at Col 4 logic
   ]);
   
   // Log Creation
