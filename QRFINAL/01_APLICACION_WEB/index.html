@@ -100,14 +100,24 @@
 
         <!-- Install App Section (Universally Visible at Bottom) -->
         <div id="install-container" style="margin-top: 2rem; text-align: center; display: block;">
-            <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente?</p>
-            <button class="btn btn-primary" id="btn-install" onclick="installPWA()"
-                style="width: 100%; background: var(--text); box-shadow: none;">
-                <span class="material-icons-round">download_for_offline</span> Instalar App
-            </button>
+            <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente? y ¿Problemas?
+            </p>
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                <button class="btn btn-primary" id="btn-install" onclick="installPWA()"
+                    style="flex: 1; min-width: 120px; box-shadow: none;">
+                    <span class="material-icons-round">download_for_offline</span> Instalar
+                </button>
+                <button class="btn btn-secondary" onclick="hardResetApp()"
+                    style="flex: 1; min-width: 120px; background: #ef4444; color: white; border: none;">
+                    <span class="material-icons-round">refresh</span> Actualizar
+                </button>
+            </div>
             <p id="install-msg" style="display:none; color: var(--text-light); font-size: 0.8rem; margin-top: 0.5rem;">
                 Si no funciona, busca "Instalar" en el menú de tu navegador.
             </p>
+            <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-light); opacity: 0.6;">
+                v5.2 Ultra-Offline
+            </div>
         </div>
 
     </main>
