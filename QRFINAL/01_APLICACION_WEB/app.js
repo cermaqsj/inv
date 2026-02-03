@@ -124,7 +124,11 @@ async function checkConnection() {
 
         } else {
             // Fallback if no local DB
+            console.error("CRITICAL: OFFLINE_DB is undefined! Check products.js");
             allProductsCache = data;
+            // Add visual cue for the user
+            updateStatus('online', `Conectado (${allProductsCache.length} prod) [SIN BASE LOCAL]`);
+            return true;
         }
 
         localStorage.setItem('cermaq_products_cache', JSON.stringify(allProductsCache));
@@ -133,7 +137,8 @@ async function checkConnection() {
         const pending = JSON.parse(localStorage.getItem('pending_txs') || '[]');
         updatePendingBadge(pending.length);
 
-        updateStatus('online', `Conectado (${allProductsCache.length} productos)`);
+        const source = (typeof OFFLINE_DB !== 'undefined') ? 'Base Hybrida' : 'Solo API';
+        updateStatus('online', `En Linea (${allProductsCache.length}) - ${source}`);
         return true;
     } catch (error) {
         console.error(error);
