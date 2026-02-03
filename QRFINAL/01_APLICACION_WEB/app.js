@@ -39,16 +39,32 @@ function getApiUrl() {
 }
 
 async function checkConnection() {
+    // Load from OFFLINE DB (Fastest)
+    if (typeof OFFLINE_DB !== 'undefined') {
+        const localDB = OFFLINE_DB;
+
+        // Merge with any "current" stock updates from API if we have them cached
+        const apiCache = JSON.parse(localStorage.getItem('cermaq_products_cache') || '[]');
+
+        if (apiCache.length > 0) {
+            // Create a map of API data for fast lookup
+            const apiMap = new Map(apiCache.map(p => [String(p.id), p]));
+
+            // Merge: Use API data if available (newer stock), else fallback to OFFLINE_DB
+            allProductsCache = localDB.map(p => {
+                const apiP = apiMap.get(String(p.id));
+                return apiP ? apiP : p;
+            });
+        } else {
+            allProductsCache = localDB;
+        }
+
+        updateStatus('offline', `Base Local (${allProductsCache.length} prod)`);
+        console.log("Loaded from OFFLINE_DB");
+    }
+
     // Process queue on connect
     if (navigator.onLine) processQueue();
-
-    // Load from local Cache first for instant feel
-    const cachedData = localStorage.getItem('cermaq_products_cache');
-    if (cachedData) {
-        allProductsCache = JSON.parse(cachedData);
-        updateStatus('offline', `Offline (${allProductsCache.length} prod)`);
-        console.log("Loaded from local cache");
-    }
 
     updateStatus('connecting', 'Conectando...');
     try {
@@ -56,9 +72,9 @@ async function checkConnection() {
         if (!response.ok) throw new Error("API Error");
 
         const data = await response.json();
-        allProductsCache = data; // Cache for search
 
-        // SAVE TO LOCAL STORAGE
+        // Update Cache with fresh data from Server
+        allProductsCache = data;
         localStorage.setItem('cermaq_products_cache', JSON.stringify(data));
 
         // Update queue badge just in case
@@ -69,6 +85,7 @@ async function checkConnection() {
         return true;
     } catch (error) {
         console.error(error);
+        // If we failed but have OFFLINE_DB, we are still good
         if (allProductsCache.length > 0) {
             updateStatus('offline', `Modo Offline (${allProductsCache.length} prod)`);
         } else {
