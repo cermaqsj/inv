@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bodega Cermaq | Scanner Premium</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PWA & Mobile -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="Cermaq_logo2.png">
+
+    <!-- Libraries -->
+    <script src="./html5-qrcode.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('Service Worker Registered'));
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav>
+        <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo">
+        <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()">
+            <span class="material-icons-round">admin_panel_settings</span>
+        </button>
+    </nav>
+
+    <main>
+        <!-- Status Indicator Centered -->
+        <div class="status-pill" style="margin: 0 auto;">
+            <span id="status-dot" class="dot"></span>
+            <span id="status-text">Iniciando...</span>
+        </div>
+
+        <!-- Scanner Section -->
+        <div class="card">
+            <div class="scanner-wrapper">
+                <div id="reader"></div>
+                <div class="scan-overlay">
+                    <span class="material-icons-round"
+                        style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.8;">qr_code_scanner</span>
+                    <p style="margin: 0; font-size: 1.1rem;">Apunta a un código QR</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-scan-start" style="width: 100%; margin-top: 1.5rem;">
+                <span class="material-icons-round">camera_alt</span>
+                <span id="btn-scan-text">ACTIVAR CÁMARA</span>
+            </button>
+        </div>
+
+        <!-- Quick Actions -->
+        <!-- Quick Actions & Search -->
+        <div style="margin-top: 1rem;">
+            <div class="input-group" style="margin-bottom: 0.5rem;">
+                <input type="text" id="search-input" class="input-field" placeholder="🔍 Buscar por Nombre o ID..."
+                    onkeyup="handleSearch()">
+            </div>
+            <div id="search-results" class="search-results" style="display:none;"></div>
+        </div>
+
+        <div class="grid-cols-2" style="margin-top: 1rem;">
+            <!-- Removed Manual button as Search replaces it -->
+            <button class="btn btn-secondary admin-only" onclick="openCreateModal()">
+                <span class="material-icons-round">add_circle</span> Crear
+            </button>
+            <button class="btn btn-secondary admin-only" onclick="window.open('FICHAS_IMPRESION.html', '_blank')">
+                <span class="material-icons-round">qr_code_2</span> Etiquetas
+            </button>
+        </div>
+
+        <button class="btn btn-secondary" onclick="openHistoryModal()" style="width: 100%; margin-top: 1rem;">
+            <span class="material-icons-round">history</span> Ver Historial
+        </button>
+
+        <!-- Admin Utilities Row -->
+        <div class="admin-only" style="margin-top: 1rem;">
+            <!-- Admin content available for future use -->
+        </div>
+
+        <!-- Install App Section (Universally Visible at Bottom) -->
+        <div id="install-container" style="margin-top: 2rem; text-align: center; display: block;">
+            <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente?</p>
+            <button class="btn btn-primary" id="btn-install" onclick="installPWA()"
+                style="width: 100%; background: var(--text); box-shadow: none;">
+                <span class="material-icons-round">download_for_offline</span> Instalar App
+            </button>
+            <p id="install-msg" style="display:none; color: var(--text-light); font-size: 0.8rem; margin-top: 0.5rem;">
+                Si no funciona, busca "Instalar" en el menú de tu navegador.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Product Modal -->
+    <div class="modal-backdrop" id="modal-product">
+        <div class="modal-content">
+            <div class="product-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="text" id="p-name" class="product-name-input" value="Cargando..." disabled>
+                    <button class="icon-btn admin-only" id="btn-save-name" onclick="saveProductName()"
+                        style="display:none; color:var(--primary);">
+                        <span class="material-icons-round">save</span>
+                    </button>
+                </div>
+                <div class="product-meta">ID: <span id="p-id">-</span></div>
+            </div>
+
+            <div class="stock-display">
+                <span class="label">Stock Actual</span>
+                <span class="value" id="p-stock">--</span>
+            </div>
+
+            <div class="qty-control">
+                <button class="qty-btn" onclick="adjustQty(-1)">-</button>
+                <input type="number" id="qty-input" class="qty-input" value="1" readonly inputmode="numeric"
+                    pattern="[0-9]*">
+                <button class="qty-btn" onclick="adjustQty(1)">+</button>
+            </div>
+
+            <!-- New Fields for Industrial Logs -->
+            <div class="input-group">
+                <input type="text" id="tx-comment" class="input-field" placeholder="Motivo / Comentario (Opcional)">
+            </div>
+            <div class="input-group admin-only">
+                <input type="number" id="tx-price" class="input-field" placeholder="Precio Unitario (Admin)"
+                    inputmode="numeric" pattern="[0-9]*">
+            </div>
+
+            <div class="grid-cols-2">
+                <button class="btn btn-in" onclick="handleTransaction('IN')">
+                    <span class="material-icons-round">arrow_downward</span> INGRESO
+                </button>
+                <button class="btn btn-out" onclick="handleTransaction('OUT')">
+                    <span class="material-icons-round">arrow_upward</span> SALIDA
+                </button>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 1.5rem; color: var(--text-light);"
+                onclick="closeModal()">
+                Cancelar Operación
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Product Modal -->
+    <div class="modal-backdrop" id="modal-create">
+        <div class="modal-content">
+            <div class="product-header">
+                <h2>Nuevo Producto</h2>
+                <div class="product-meta">Agrega un ítem al inventario</div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <div class="input-group">
+                    <label class="input-label">Nº Artículo (ID)</label>
+                    <input type="number" id="new-id" class="input-field" placeholder="101010" inputmode="numeric"
+                        pattern="[0-9]*">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Descripción</label>
+                    <input type="text" id="new-name" class="input-field" placeholder="Ej. Aceite Motor 5W30">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Stock Inicial</label>
+                    <input type="number" id="new-stock" class="input-field" value="0" inputmode="numeric"
+                        pattern="[0-9]*">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="handleCreate()">
+                CREAR PRODUCTO
+            </button>
+
+            <button class="btn" style="width: 100%; margin-top: 1rem; color: var(--text-light);" onclick="closeModal()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal-backdrop" id="modal-login">
+        <div class="modal-content">
+            <h2>Acceso Administrador</h2>
+            <div class="input-group">
+                <label class="input-label">Contraseña</label>
+                <input type="password" id="admin-pass" class="input-field">
+            </div>
+            <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%">ENTRAR</button>
+            <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="closeModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Labels Modal -->
+    <div class="modal-backdrop" id="modal-labels">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="product-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Etiquetas QR</h2>
+                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
+            </div>
+            <p class="product-meta">Imprime estas fichas para pegar en estanterías.</p>
+
+            <button class="btn btn-primary" onclick="printLabels()" style="width: 100%; margin: 1rem 0;">
+                <span class="material-icons-round">print</span> IMPRIMIR
+            </button>
+
+            <div id="label-container" class="label-grid">
+                <!-- Labels generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart / Batch Modal -->
+    <div class="modal-backdrop" id="modal-cart">
+        <div class="modal-content" style="height: 85vh;">
+            <div class="product-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Lista de Movimientos</h2>
+                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
+            </div>
+            <p class="product-meta">Revisa los ítems antes de confirmar.</p>
+
+            <!-- User Attribution (Fixed: Moved outside dynamic list) -->
+            <div class="input-group" style="margin-bottom: 1rem; padding: 0 1rem;">
+                <label class="input-label">Solicitante / Responsable <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="input-responsable" class="input-field"
+                    placeholder="Nombre de quien retira/ingresa">
+            </div>
+
+            <div id="cart-items-container" class="cart-list">
+                <!-- Items will be injected here -->
+                <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+                    Tu lista está vacía.
+                </div>
+            </div>
+
+            <div class="cart-footer">
+                <button id="btn-confirm-cart" class="btn btn-success" onclick="processCart()" style="width: 100%;">
+                    <span class="material-icons-round">send</span> CONFIRMAR TODO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-backdrop" id="modal-history">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="product-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Historial</h2>
+                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
+            </div>
+
+            <div class="input-group" style="margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="loadHistory()" style="width:100%">
+                    <span class="material-icons-round">refresh</span> Actualizar
+                </button>
+            </div>
+
+            <div id="history-list" class="cart-list" style="margin-top: 1rem;">
+                <!-- Logs injected here -->
+                <div class="history-loading">Carga el historial para ver registros...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button for Cart -->
+    <button id="fab-cart" class="fab" onclick="openCartModal()">
+        <span class="material-icons-round">playlist_add_check</span>
+        <span id="cart-badge" class="badge">0</span>
+    </button>
+
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
