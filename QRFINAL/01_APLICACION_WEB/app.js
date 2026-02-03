@@ -148,15 +148,34 @@ async function checkConnection() {
 }
 
 async function fetchProduct(id) {
-    showToast('Buscando producto...', 'info');
-    try {
-        const response = await fetch(getApiUrl());
-        const data = await response.json();
-        return data.find(p => String(p.id) === String(id));
-    } catch (e) {
-        showToast('Error de conexión', 'error');
-        return null;
+    // 1. Try Cache First (Instant & Offline Friendly)
+    if (allProductsCache && allProductsCache.length > 0) {
+        const cached = allProductsCache.find(p => String(p.id) === String(id));
+        if (cached) {
+            console.log("Producto encontrado en Cache:", cached.nombre);
+            return cached;
+        }
     }
+
+    // 2. Only if not in cache (and online), try network
+    // This handles cases where a brand new item was added by another user 
+    // and we haven't synced yet.
+    if (navigator.onLine) {
+        showToast('Buscando en servidor...', 'info');
+        try {
+            const response = await fetch(getApiUrl());
+            const data = await response.json();
+
+            // Update cache while we are at it
+            allProductsCache = data;
+
+            return data.find(p => String(p.id) === String(id));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    return null;
 }
 
 async function sendTransaction(payload) {
