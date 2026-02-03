@@ -149,19 +149,18 @@ main {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.8);
+    background: #ffffff;
     padding: 8px 16px;
     border-radius: 50px;
     font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-light);
-    font-weight: 500;
-    color: var(--text-light);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid white;
-    /* Spacing for new location */
-    margin-bottom: 1rem;
-    align-self: center;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 4px 12px rgba(0, 75, 141, 0.15);
+    border: 1px solid #e2e8f0;
+    /* Ensuring visibility */
+    margin: 0 auto 1.5rem auto;
+    position: relative;
+    z-index: 10;
 }
 
 .dot {

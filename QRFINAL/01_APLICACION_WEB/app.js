@@ -3,10 +3,10 @@
  */
 const CONFIG = {
     // Default API URL from user
-    // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbxfpcRoJLxWyu3LlRRkNHysojwhQNURyB3oP7nFlmZPkErAo9lCYPO9VXpxbcd2Exel/exec',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbyt6-elRLZcc7USKgUR8Dr0ZABMrj3SSEekxldShywsmr6ueey0U-ewxlGI1jSyIce0/exec',
     STORAGE_KEY: 'cermaq_inventory_url',
 };
+
 
 let html5QrcodeScanner = null;
 let currentProduct = null;
@@ -374,6 +374,22 @@ async function processCart() {
         return;
     }
 
+    // Validation: Password
+    const passInput = document.getElementById('input-clave');
+    const clave = passInput ? passInput.value.trim() : "";
+
+    if (!clave) {
+        showToast("Debes ingresar la contraseña de operario", "error");
+        if (passInput) {
+            passInput.classList.add('error-pulse');
+            setTimeout(() => passInput.classList.remove('error-pulse'), 500);
+            passInput.focus();
+        }
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        return;
+    }
+
     // Save for next time
     localStorage.setItem('last_user_name', user);
 
@@ -387,8 +403,9 @@ async function processCart() {
                 action: item.type,
                 id: item.id,
                 quantity: item.qty,
-                user: user, // Sent here
-                nombre: item.name, // Send name in case of update
+                user: user,
+                clave: clave, // Sending password for security check
+                nombre: item.name,
                 comment: item.comment || "",
                 price: item.price || ""
             });
@@ -412,11 +429,11 @@ async function processCart() {
         cart = [];
         updateCartBadge();
         closeModal();
+        // Clear password for security
+        if (passInput) passInput.value = "";
         checkConnection(); // Refresh global stock
     } else {
-        alert(`Se procesaron ${successCount} ítems correctament, pero hubo errores:\n\n${errors.join('\n')}`);
-        // Remove successful ones? For now, we keep cart for retry or manual clear
-        // Ideally we filter out the successful ones from 'cart' here.
+        alert(`Se procesaron ${successCount} ítems correctamente, pero hubo errores:\n\n${errors.join('\n')}`);
     }
 }
 
@@ -757,6 +774,18 @@ async function manualInput() {
 
         // Open product modal
         await openProductModal(input);
+    }
+}
+
+function openSpreadsheet() {
+    // You can replace this with the exact URL later
+    const url = "https://docs.google.com/spreadsheets/d/1B-ABCD-1234/edit";
+    // Ask user for URL if not configured or just open placeholder
+    const userUrl = prompt("Ingresa el Link de tu Google Sheet:", localStorage.getItem('sheet_url') || "");
+
+    if (userUrl) {
+        localStorage.setItem('sheet_url', userUrl);
+        window.open(userUrl, '_blank');
     }
 }
 

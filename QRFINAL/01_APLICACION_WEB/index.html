@@ -42,7 +42,8 @@
 
     <main>
         <!-- Status Indicator Centered -->
-        <div class="status-pill" style="margin: 0 auto;">
+        <!-- Status Indicator Centered -->
+        <div class="status-pill">
             <span id="status-dot" class="dot"></span>
             <span id="status-text">Iniciando...</span>
         </div>
@@ -90,7 +91,10 @@
 
         <!-- Admin Utilities Row -->
         <div class="admin-only" style="margin-top: 1rem;">
-            <!-- Admin content available for future use -->
+            <button class="btn btn-secondary" onclick="openSpreadsheet()"
+                style="width: 100%; border-color: #10b981; color: #10b981;">
+                <span class="material-icons-round">table_view</span> Ver Planilla Google Sheets
+            </button>
         </div>
 
         <!-- Install App Section (Universally Visible at Bottom) -->
@@ -244,6 +248,12 @@
                 <label class="input-label">Solicitante / Responsable <span style="color:var(--danger)">*</span></label>
                 <input type="text" id="input-responsable" class="input-field"
                     placeholder="Nombre de quien retira/ingresa">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 1rem; padding: 0 1rem;">
+                <label class="input-label">Contraseña de Operario <span style="color:var(--danger)">*</span></label>
+                <input type="password" id="input-clave" class="input-field"
+                    placeholder="Ingrese clave (Ej. 1234)">
             </div>
 
             <div id="cart-items-container" class="cart-list">
