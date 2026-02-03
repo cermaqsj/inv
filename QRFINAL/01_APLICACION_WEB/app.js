@@ -3,7 +3,7 @@
  */
 const CONFIG = {
     // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbyt6-elRLZcc7USKgUR8Dr0ZABMrj3SSEekxldShywsmr6ueey0U-ewxlGI1jSyIce0/exec',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbwRCxoABQ4poFfJzfNC31rN52u488Oizk-rJY-7GwDP6G4S54Yn4Mymc558tKAWHxmj/exec',
     STORAGE_KEY: 'cermaq_inventory_url',
 };
 
