@@ -93,15 +93,47 @@ async function checkConnection() {
 
         const data = await response.json();
 
-        // Update Cache with fresh data from Server
-        allProductsCache = data;
-        localStorage.setItem('cermaq_products_cache', JSON.stringify(data));
+        // SMART MERGE: 
+        // We trust OFFLINE_DB for the *list* of products (1001 items).
+        // We trust 'data' (API) for the *latest stock* of the products it knows about.
+        // We do NOT let the API truncate our list if the Sheet is incomplete (e.g. only 500 rows).
+
+        if (typeof OFFLINE_DB !== 'undefined') {
+            const apiMap = new Map(data.map(p => [String(p.id), p]));
+
+            // Map over our Master Local DB and update with API data where available
+            allProductsCache = OFFLINE_DB.map(localP => {
+                const apiP = apiMap.get(String(localP.id));
+                if (apiP) {
+                    // Update stock and name from API (Server Authority for values)
+                    return { ...localP, stock: apiP.stock, nombre: apiP.nombre, categoria: apiP.categoria };
+                }
+                return localP; // Keep local version if not in API
+            });
+
+            // Optional: If API has new items totally unknown to local (rare), add them?
+            // For now, let's stick to the robust local list + updates. 
+            // If we really want to append new API items:
+            /*
+            data.forEach(apiP => {
+                if (!OFFLINE_DB.find(localP => String(localP.id) === String(apiP.id))) {
+                    allProductsCache.push(apiP);
+                }
+            });
+            */
+
+        } else {
+            // Fallback if no local DB
+            allProductsCache = data;
+        }
+
+        localStorage.setItem('cermaq_products_cache', JSON.stringify(allProductsCache));
 
         // Update queue badge just in case
         const pending = JSON.parse(localStorage.getItem('pending_txs') || '[]');
         updatePendingBadge(pending.length);
 
-        updateStatus('online', `Conectado (${data.length} productos)`);
+        updateStatus('online', `Conectado (${allProductsCache.length} productos)`);
         return true;
     } catch (error) {
         console.error(error);
