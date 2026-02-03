@@ -31,6 +31,26 @@ function initApp() {
     });
 }
 
+async function hardResetApp() {
+    if (!confirm("¿Estás seguro?\nEsto borrará los datos guardados en el dispositivo y recargará la última versión de la App.")) return;
+
+    updateStatus('connecting', 'Limpiando...');
+
+    // 1. Unregister Service Workers
+    if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+            await registration.unregister();
+        }
+    }
+
+    // 2. Clear Local Storage
+    localStorage.clear();
+
+    // 3. Force cache reload
+    window.location.reload(true);
+}
+
 /**
  * API HANDLING
  */
