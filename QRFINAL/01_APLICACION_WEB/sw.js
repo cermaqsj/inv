@@ -15,8 +15,26 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
+    self.skipWaiting(); // Force activation
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    );
+});
+
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        Promise.all([
+            self.clients.claim(), // Take control of open tabs
+            caches.keys().then((keys) => {
+                return Promise.all(
+                    keys.map((key) => {
+                        if (key !== CACHE_NAME) {
+                            return caches.delete(key);
+                        }
+                    })
+                );
+            })
+        ])
     );
 });
 
