@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnóstico Final de Conexión</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fafafa;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .status-box {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .info {
+            background: #e0f2fe;
+            color: #075985;
+            border: 1px solid #bae6fd;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🩺 Diagnóstico de Conectividad (CORS)</h1>
+    <p>Este test simula exactamente cómo la App intenta conectarse. Si la App dice "Offline" pero el enlace directo
+        funcionaba, el problema suele ser "CORS" (Bloqueo de Seguridad del Navegador).</p>
+
+    <div class="card">
+        <h3>Prueba en Vivo</h3>
+        <p><strong>URL Destino:</strong> <span id="target-url">Cargando...</span></p>
+        <button class="btn" onclick="runTest()">EJECUTAR PRUEBA DE CONEXIÓN</button>
+        <div id="log" class="status-box info" style="display:none;">Esperando inicio...</div>
+    </div>
+
+    <script>
+        // La URL EXACTA de tu app.js v7.4
+        const TARGET_URL = 'https://script.google.com/macros/s/AKfycby1-qTOq2NTBeBUsmElu3sl11j1Y79FXgUS_KbIqz5Y1gglz1ggBvaiQqWJoeG5bOp1Zw/exec';
+
+        document.getElementById('target-url').textContent = TARGET_URL;
+
+        function log(msg, type = 'info') {
+            const el = document.getElementById('log');
+            el.style.display = 'block';
+            el.className = 'status-box ' + type;
+            el.textContent = msg;
+        }
+
+        async function runTest() {
+            log('🚀 Iniciando petición fetch()...', 'info');
+
+            try {
+                const startTime = performance.now();
+                const response = await fetch(TARGET_URL);
+                const duration = Math.round(performance.now() - startTime);
+
+                log(`⏳ Respuesta recibida en ${duration}ms.\nEstado HTTP: ${response.status} ${response.statusText}`, 'info');
+
+                if (!response.ok) {
+                    throw new Error(`El servidor respondió con error: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                log(`📡 Tipo de Contenido: ${contentType}\nIntentando leer JSON...`, 'info');
+
+                const data = await response.json();
+
+                log(`✅ ¡ÉXITO TOTAL!\n\nProductos Recibidos: ${data.length}\nPrimer ID: ${data[0]?.id || 'N/A'}\n\nConclusión: Tu conexión funciona perfectamente. Si la App no conecta, es PORQUE TU NAVEGADOR ESTÁ USANDO UNA VERSIÓN VIEJA EN CACHÉ.`, 'success');
+
+            } catch (error) {
+                console.error(error);
+                let msg = `❌ ERROR FATAL:\n${error.message}\n\n`;
+
+                if (error.message.includes('Failed to fetch')) {
+                    msg += "DIAGNÓSTICO: Bloqueo CORS o Error de Red.\n" +
+                        "Aunque el enlace abre en pestaña nueva, Google Script puede estar bloqueando peticiones desde 'cermaqsj.github.io'.\n" +
+                        "Asegúrate que el script devuelve: ContentService.createTextOutput(...).setMimeType(ContentService.MimeType.JSON)";
+                }
+
+                log(msg, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
