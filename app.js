@@ -471,9 +471,10 @@ function renderCart() {
         return;
     }
 
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
+    cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
             <div class="cart-item-info">
                 <h4>${item.name}</h4>
                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
@@ -494,8 +495,8 @@ function renderCart() {
                 </button>
             </div>
         `;
-    container.appendChild(div);
-});
+        container.appendChild(div);
+    });
 }
 
 function updateCartQty(index, delta) {
