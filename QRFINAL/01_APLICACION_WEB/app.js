@@ -3,8 +3,8 @@
  */
 const CONFIG = {
     // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbzk5MeTD_9WM6s5sbQm0wZxxuqA6spzo5WpZ9A1DgR2u5ZYhyLBviSlDLyZ4jFI-4Up/exec',
-    STORAGE_KEY: 'cermaq_inventory_url',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbwMHhY6ZUfDuLcA15FsQXaP9dpQrb4VDf1qsTAGG2snVpJxXDwjYy0rQo6oxCtoEx2r/exec',
+    STORAGE_KEY: 'cermaq_inventory_url_v2',
 };
 
 
@@ -872,7 +872,7 @@ async function manualInput() {
 
 function openSpreadsheet() {
     // You can replace this with the exact URL later
-    const url = "https://docs.google.com/spreadsheets/d/1B-ABCD-1234/edit";
+    const url = "";
     // Ask user for URL if not configured or just open placeholder
     const userUrl = prompt("Ingresa el Link de tu Google Sheet:", localStorage.getItem('sheet_url') || "");
 
