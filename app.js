@@ -11,6 +11,7 @@ const CONFIG = {
 let html5QrcodeScanner = null;
 let currentProduct = null;
 let isScanning = false;
+let isBatchScanning = false; // Flag for batch mode
 let isAdmin = false;
 let allProductsCache = []; // For search
 
@@ -59,6 +60,14 @@ function initApp() {
     window.addEventListener('offline', () => {
         updateStatus('offline', 'Modo Offline');
         showToast('Sin conexión. Trabajando en local.', 'warning');
+    });
+
+    // Batch Mode Listener (Enter key on ID or Qty adds item)
+    document.getElementById('batch-qty').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleBatchAdd();
+    });
+    document.getElementById('batch-id').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('batch-qty').focus();
     });
 
     // Close modal on click outside (optional or keep simple)
@@ -622,6 +631,15 @@ function onScanSuccess(decodedText) {
     // const audio = new Audio('beep.mp3'); audio.play();
 
     stopScanner(); // Consider keeping it open for "Continuous Mode" later
+
+    if (isBatchScanning) {
+        isBatchScanning = false;
+        openBatchModal();
+        document.getElementById('batch-id').value = decodedText;
+        document.getElementById('batch-qty').focus();
+        return;
+    }
+
     openProductModal(decodedText);
 }
 
@@ -1015,6 +1033,95 @@ async function openProductModal(idOrData) {
     document.getElementById('qty-input').value = 1;
 
     document.getElementById('modal-product').classList.add('active');
+}
+
+/**
+ * BATCH / QUICK ENTRY LOGIC
+ */
+function openBatchModal() {
+    document.getElementById('modal-batch').classList.add('active');
+    setTimeout(() => {
+        document.getElementById('batch-id').focus();
+    }, 300);
+    updateBatchBadge();
+}
+
+function adjustBatchQty(delta) {
+    const input = document.getElementById('batch-qty');
+    let val = parseInt(input.value) || 1;
+    val += delta;
+    if (val < 1) val = 1;
+    input.value = val;
+}
+
+function handleBatchAdd() {
+    const idInput = document.getElementById('batch-id');
+    const qtyInput = document.getElementById('batch-qty');
+    const id = idInput.value.trim();
+    const qty = parseInt(qtyInput.value) || 1;
+
+    if (!id) {
+        showToast("Falta el ID", "error");
+        idInput.focus();
+        return;
+    }
+
+    // Try to find name
+    let name = "Item " + id;
+    const existing = allProductsCache.find(p => String(p.id) === String(id));
+    if (existing) {
+        name = existing.nombre;
+    } else {
+        // Optional: Warn if unknown? For now, allow it (maybe new item)
+        // showToast("Item nuevo o no encontrado", "info");
+    }
+
+    // Add to Cart directly
+    cart.push({
+        id: id,
+        name: name,
+        type: 'IN', // Default to IN for batch entry? Usually mass entry is checking in. 
+        // Or we could add a selector. Based on user request "Ingresos masivos", IN is safe.
+        qty: qty,
+        timestamp: new Date(),
+        comment: "Ingreso Rápido",
+        price: ""
+    });
+
+    showToast(`${name} agregado`, 'success');
+
+    // UI Feedback in Batch Modal
+    const preview = document.getElementById('batch-preview');
+    if (preview.innerHTML.includes('vacía')) preview.innerHTML = '';
+
+    const div = document.createElement('div');
+    div.style.padding = "5px 0";
+    div.style.borderBottom = "1px dashed #eee";
+    div.innerHTML = `<b>${qty}x</b> ${name} <span style="font-size:0.8em">(${id})</span>`;
+    preview.prepend(div);
+
+    // Reset for next
+    idInput.value = "";
+    qtyInput.value = "1";
+    idInput.focus();
+    updateBatchBadge();
+    updateCartBadge();
+}
+
+function updateBatchBadge() {
+    document.getElementById('batch-badge').innerText = cart.length;
+}
+
+// Special Scanner for Batch
+function startScannerBatch() {
+    // Reuse main scanner logic but redirect output
+    // This requires a tweak to onScanSuccess to handle "Batch Mode" state
+    // For simplicity, let's close batch modal, scan, and fill batch input?
+    // No, better to have a flag.
+
+    isBatchScanning = true; // Use global flag (declare up top)
+    closeModal(); // Close batch modal temporarily to show scanner
+    startScanner();
 }
 /**
  * ADMIN & SEARCH LOGIC
