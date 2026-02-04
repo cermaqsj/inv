@@ -444,23 +444,50 @@ function renderCart() {
         return;
     }
 
-    cart.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
             <div class="cart-item-info">
                 <h4>${item.name}</h4>
-                <p>ID: ${item.id} | Cantidad: <b>${item.qty}</b></p>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                    <span style="font-size: 0.9rem; color: var(--text-light);">ID: ${item.id}</span>
+                </div>
             </div>
-            <div class="cart-item-action">
-                <span class="tag ${item.type === 'IN' ? 'in' : 'out'}">${item.type}</span>
-                <button class="icon-btn" onclick="removeFromCart(${index})">
-                    <span class="material-icons-round" style="color: var(--danger)">delete</span>
+            <div class="cart-item-action" style="flex-direction: column; align-items: flex-end; gap: 5px;">
+                <span class="tag ${item.type === 'IN' ? 'in' : 'out'}" style="margin: 0;">${item.type}</span>
+                
+                <div class="cart-qty-wrapper" style="display: flex; align-items: center; gap: 5px; background: #f3f4f6; padding: 2px; border-radius: 6px;">
+                    <button class="qty-mini-btn" onclick="updateCartQty(${index}, -1)">-</button>
+                    <span style="font-weight: 600; min-width: 20px; text-align: center;">${item.qty}</span>
+                    <button class="qty-mini-btn" onclick="updateCartQty(${index}, 1)">+</button>
+                </div>
+
+                <button class="icon-btn" onclick="removeFromCart(${index})" style="margin-top: 5px;">
+                    <span class="material-icons-round" style="font-size: 1.2rem; color: var(--danger)">delete</span>
                 </button>
             </div>
         `;
-        container.appendChild(div);
-    });
+    container.appendChild(div);
+});
+}
+
+function updateCartQty(index, delta) {
+    const item = cart[index];
+    const newQty = item.qty + delta;
+
+    if (newQty <= 0) {
+        if (confirm('¿Eliminar este ítem?')) {
+            cart.splice(index, 1);
+        }
+    } else {
+        // Optional: Check stock for OUT (simple check)
+        if (item.type === 'OUT' && delta > 0) {
+            // We can re-check stock here if strictly needed, 
+            // but user asked for simple UI first.
+        }
+        item.qty = newQty;
+    }
+    renderCart();
 }
 
 function removeFromCart(index) {

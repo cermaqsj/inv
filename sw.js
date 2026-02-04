@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v7.6-fix-token';
+const CACHE_NAME = 'cermaq-bodega-v7.7-features';
 const ASSETS = [
     './',
     './index.html',
