@@ -116,7 +116,7 @@ async function checkConnection() {
         const apiUrl = getApiUrl();
         console.log("Fetching from:", apiUrl); // Debug
 
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl + '?action=getInventario');
         if (!response.ok) throw new Error("API Error");
 
         const data = await response.json();
@@ -194,7 +194,7 @@ async function fetchProduct(id) {
     if (navigator.onLine) {
         showToast('Buscando en servidor...', 'info');
         try {
-            const response = await fetch(getApiUrl());
+            const response = await fetch(getApiUrl() + '?action=getInventario');
             const data = await response.json();
 
             // Update cache while we are at it
