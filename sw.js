@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v7.2-correct-source';
+const CACHE_NAME = 'cermaq-bodega-v7.3-permissions-fix';
 const ASSETS = [
     './',
     './index.html',
