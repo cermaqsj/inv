@@ -1202,28 +1202,3 @@ function renderHistoryItem(item, status) {
     </div>
     `;
 }
-
-container.innerHTML = data.map(row => {
-    const dateObj = new Date(row.fecha);
-    const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    return `
-            <div class="cart-item" style="flex-direction:column; align-items:flex-start; gap:5px;">
-                <div style="display:flex; justify-content:space-between; width:100%;">
-                    <small style="color:#666">${dateStr}</small>
-                    <span class="tag ${row.accion === 'IN' ? 'in' : 'out'}">${row.accion}</span>
-                </div>
-                <div>
-                     <strong>${row.nombre}</strong> <br>
-                     <span style="font-size:0.9em">${row.cantidad} unid. | <b>${row.usuario}</b></span>
-                </div>
-                ${row.comentario ? `<div style="font-size:0.85em; color:#555; font-style:italic; background:#f0f0f0; padding:4px; width:100%; border-radius:4px;">"${row.comentario}"</div>` : ''}
-            </div>
-            `;
-}).join('');
-
-    } catch (e) {
-    console.error(e);
-    container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error de conexión</div>';
-}
-}

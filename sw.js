@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v8.6-rescue-mission';
+const CACHE_NAME = 'cermaq-bodega-v8.7-final-fix';
 const ASSETS = [
     './',
     './index.html',
