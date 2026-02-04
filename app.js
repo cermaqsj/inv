@@ -48,6 +48,19 @@ function initApp() {
     // Setup event listeners
     document.getElementById('btn-scan-start').addEventListener('click', startScanner);
 
+    // Auto-Sync on Reconnect
+    window.addEventListener('online', () => {
+        updateStatus('online', 'Conexión Restablecida');
+        showToast('Conexión recuperada. Sincronizando...', 'success');
+        processQueue();
+        checkConnection(); // Re-fetch latest stock
+    });
+
+    window.addEventListener('offline', () => {
+        updateStatus('offline', 'Modo Offline');
+        showToast('Sin conexión. Trabajando en local.', 'warning');
+    });
+
     // Close modal on click outside (optional or keep simple)
     document.querySelector('.modal-backdrop').addEventListener('click', (e) => {
         if (e.target === e.currentTarget) closeModal();
