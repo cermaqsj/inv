@@ -63,12 +63,17 @@ function initApp() {
     });
 
     // Batch Mode Listener (Enter key on ID or Qty adds item)
-    document.getElementById('batch-qty').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleBatchAdd();
-    });
-    document.getElementById('batch-id').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') document.getElementById('batch-qty').focus();
-    });
+    const batchQtyInput = document.getElementById('batch-qty');
+    const batchIdInput = document.getElementById('batch-id');
+
+    if (batchQtyInput && batchIdInput) {
+        batchQtyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleBatchAdd();
+        });
+        batchIdInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('batch-qty').focus();
+        });
+    }
 
     // Close modal on click outside (optional or keep simple)
     document.querySelector('.modal-backdrop').addEventListener('click', (e) => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v8.1-batch-mode';
+const CACHE_NAME = 'cermaq-bodega-v8.2-crash-fix';
 const ASSETS = [
     './',
     './index.html',
