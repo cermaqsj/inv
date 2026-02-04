@@ -7,6 +7,26 @@ const CONFIG = {
     STORAGE_KEY: 'cermaq_inventory_url_v2',
 };
 
+// --- EMERGENCY RESET (RUNS IMMEDIATELY) ---
+(function () {
+    const RESET_KEY = 'v8.6-RESCUE';
+    try {
+        if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_KEY) {
+            console.warn("EXECUTING EMERGENCY RESET: " + RESET_KEY);
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(regs => {
+                    for (let r of regs) r.unregister();
+                });
+            }
+            localStorage.clear();
+            localStorage.setItem('APP_VERSION_CHECK', RESET_KEY);
+            // Reload after short delay to allow partial unregister
+            setTimeout(() => window.location.reload(true), 100);
+        }
+    } catch (e) { console.error("Reset Failed", e); }
+})();
+// ------------------------------------------
+
 
 let html5QrcodeScanner = null;
 let currentProduct = null;
@@ -20,29 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    // FORCE RESET LOGIC (One time execution for v8.4)
-    const RESET_VERSION = 'v8.4-NUCLEAR';
-    if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_VERSION) {
-        console.log("Executing Nuclear Reset...");
-
-        // 1. Unregister Service Workers
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) registration.unregister();
-            });
-        }
-
-        // 2. Clear Storage
-        localStorage.clear();
-
-        // 3. Mark as done and reload
-        localStorage.setItem('APP_VERSION_CHECK', RESET_VERSION);
-
-        // 4. Force reload from server ignoring cache
-        window.location.reload(true);
-        return;
-    }
-
     checkConnection();
 
     // Setup event listeners
