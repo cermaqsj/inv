@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v8.3-emergency-fix';
+const CACHE_NAME = 'cermaq-bodega-v8.4-stable-rollback';
 const ASSETS = [
     './',
     './index.html',

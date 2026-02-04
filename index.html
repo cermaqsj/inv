@@ -81,10 +81,6 @@
             <button class="btn btn-secondary admin-only" onclick="openCreateModal()">
                 <span class="material-icons-round">add_circle</span> Crear
             </button>
-            <button class="btn btn-secondary" onclick="openBatchModal()"
-                style="border-color: var(--in-color); color: var(--in-color);">
-                <span class="material-icons-round">playlist_add</span> Rápido
-            </button>
             <button class="btn btn-secondary admin-only" onclick="window.open('FICHAS_IMPRESION.html', '_blank')">
                 <span class="material-icons-round">qr_code_2</span> Etiquetas
             </button>
@@ -291,57 +287,6 @@
     </div>
 
     </div>
-    </div>
-
-    <!-- Batch / Quick Entry Modal -->
-    <div class="modal-backdrop" id="modal-batch">
-        <div class="modal-content">
-            <div class="product-header">
-                <h2>Ingreso Rápido</h2>
-                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
-            </div>
-            <p class="product-meta">Agrega ítems a la cola masivamente.</p>
-
-            <div
-                style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-top: 1rem; border: 1px solid #e2e8f0;">
-                <div class="input-group">
-                    <label class="input-label">ID / Código</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="batch-id" class="input-field" placeholder="Escanea o escribe..."
-                            inputmode="text">
-                        <button class="icon-btn" onclick="startScannerBatch()"
-                            style="background: white; border: 1px solid #ddd;">
-                            <span class="material-icons-round">qr_code_scanner</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="input-group" style="margin-top: 0.5rem;">
-                    <label class="input-label">Cantidad</label>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="qty-btn" onclick="adjustBatchQty(-1)">-</button>
-                        <input type="number" id="batch-qty" class="qty-input" value="1" inputmode="numeric"
-                            pattern="[0-9]*">
-                        <button class="qty-btn" onclick="adjustBatchQty(1)">+</button>
-                    </div>
-                </div>
-
-                <button class="btn btn-in" style="width: 100%; margin-top: 1rem;" onclick="handleBatchAdd()">
-                    <span class="material-icons-round">add_shopping_cart</span> AGREGAR A COLA
-                </button>
-            </div>
-
-            <div style="margin-top: 1.5rem;">
-                <h4>Agregados Recientemente</h4>
-                <div id="batch-preview" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem; color: #64748b;">
-                    <br><i>Tu sesión está vacía.</i>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" onclick="openCartModal()" style="width: 100%; margin-top: 1rem;">
-                <span class="material-icons-round">shopping_cart</span> IR A CONFIRMAR (<span id="batch-badge">0</span>)
-            </button>
-        </div>
     </div>
 
     <!-- History Modal -->
