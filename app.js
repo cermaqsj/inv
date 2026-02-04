@@ -558,6 +558,15 @@ async function processCart() {
 
             if (result.status === 'success') {
                 successCount++;
+
+                // INSTANT UPDATE: Update local cache with new stock from server
+                if (result.newStock !== undefined) {
+                    const cachedItem = allProductsCache.find(p => String(p.id) === String(item.id));
+                    if (cachedItem) {
+                        cachedItem.stock = result.newStock;
+                        console.log(`Updated local stock for ${item.id}: ${result.newStock}`);
+                    }
+                }
             } else {
                 errors.push(`${item.name}: ${result.message}`);
             }
@@ -565,6 +574,9 @@ async function processCart() {
             errors.push(`${item.name}: Error de red`);
         }
     }
+
+    // Persist updated cache immediately
+    localStorage.setItem('cermaq_products_cache', JSON.stringify(allProductsCache));
 
     // Done
     btn.innerHTML = originalText;
