@@ -59,33 +59,35 @@ function getApiUrl() {
 }
 
 async function checkConnection() {
-    // Load from OFFLINE DB (Fastest)
+    // 1. Load from LocalStorage Cache (Primary "Offline" Source)
+    const apiCache = JSON.parse(localStorage.getItem('cermaq_products_cache') || '[]');
+
+    // 2. Load from Hardcoded DB (Secondary/Fallback)
+    let localDB = [];
     if (typeof OFFLINE_DB !== 'undefined') {
-        const localDB = OFFLINE_DB;
-
-        // Merge with any "current" stock updates from API if we have them cached
-        const apiCache = JSON.parse(localStorage.getItem('cermaq_products_cache') || '[]');
-
-        if (apiCache.length > 0) {
-            // Create a map of API data for fast lookup
-            const apiMap = new Map(apiCache.map(p => [String(p.id), p]));
-
-            // Merge: Use API data if available (newer stock), else fallback to OFFLINE_DB
-            allProductsCache = localDB.map(p => {
-                const apiP = apiMap.get(String(p.id));
-                return apiP ? apiP : p;
-            });
-        } else {
-            allProductsCache = localDB;
-        }
-
-        updateStatus('offline', `Base Local (${allProductsCache.length} prod)`);
-        console.log("Loaded from OFFLINE_DB");
+        localDB = OFFLINE_DB;
     }
+
+    // 3. Determine Initial State
+    if (apiCache.length > 0) {
+        // Prefer dynamic cache we downloaded previously
+        allProductsCache = apiCache;
+        console.log("Loaded from LocalStorage Cache");
+    } else if (localDB.length > 0) {
+        // Fallback to static DB if cache is empty
+        allProductsCache = localDB;
+        console.log("Loaded from Static OFFLINE_DB");
+    } else {
+        allProductsCache = [];
+        console.log("No Local Data Available");
+    }
+
+    updateStatus('offline', `Base Local (${allProductsCache.length} prod)`);
 
     // Process queue on connect
     if (navigator.onLine) processQueue();
 
+    // 4. Update from Server
     updateStatus('connecting', 'Conectando...');
     try {
         const response = await fetch(getApiUrl());
@@ -93,62 +95,59 @@ async function checkConnection() {
 
         const data = await response.json();
 
-        // SMART MERGE: 
-        // We trust OFFLINE_DB for the *list* of products (1001 items).
-        // We trust 'data' (API) for the *latest stock* of the products it knows about.
-        // We do NOT let the API truncate our list if the Sheet is incomplete (e.g. only 500 rows).
+        // 5. Update Memory & Cache
+        // Since we migrated to a dynamic system, trust the API data fully.
+        // We only merge with localDB if we want to keep "phantom" items not in Sheet, 
+        // but for now, let's keep it clean: API is Truth.
 
-        if (typeof OFFLINE_DB !== 'undefined') {
-            const apiMap = new Map(data.map(p => [String(p.id), p]));
+        allProductsCache = data;
 
-            // Map over our Master Local DB and update with API data where available
-            allProductsCache = OFFLINE_DB.map(localP => {
-                const apiP = apiMap.get(String(localP.id));
-                if (apiP) {
-                    // Update stock and name from API (Server Authority for values)
-                    return { ...localP, stock: apiP.stock, nombre: apiP.nombre, categoria: apiP.categoria };
-                }
-                return localP; // Keep local version if not in API
-            });
-
-            // Optional: If API has new items totally unknown to local (rare), add them?
-            // For now, let's stick to the robust local list + updates. 
-            // If we really want to append new API items:
-            /*
-            data.forEach(apiP => {
-                if (!OFFLINE_DB.find(localP => String(localP.id) === String(apiP.id))) {
-                    allProductsCache.push(apiP);
-                }
-            });
-            */
-
-        } else {
-            // Fallback if no local DB
-            console.error("CRITICAL: OFFLINE_DB is undefined! Check products.js");
-            allProductsCache = data;
-            // Add visual cue for the user
-            updateStatus('online', `Conectado (${allProductsCache.length} prod) [SIN BASE LOCAL]`);
-            return true;
+        // If we strictly want to keep non-sheet items from OFFLINE_DB:
+        /*
+        if (localDB.length > 0) {
+             // Logic to append items from localDB that are NOT in data
         }
+        */
 
+        // Save to LocalStorage for next offline session
         localStorage.setItem('cermaq_products_cache', JSON.stringify(allProductsCache));
 
         // Update queue badge just in case
         const pending = JSON.parse(localStorage.getItem('pending_txs') || '[]');
         updatePendingBadge(pending.length);
 
-        const source = (typeof OFFLINE_DB !== 'undefined') ? 'Base Hybrida' : 'Solo API';
-        updateStatus('online', `En Linea (${allProductsCache.length}) - ${source}`);
+        const source = (localDB.length > 0) ? 'API + Static' : 'API Full';
+        updateStatus('online', `En Linea (${allProductsCache.length})`);
         return true;
     } catch (error) {
         console.error(error);
-        // If we failed but have OFFLINE_DB, we are still good
+        // If we failed but have data, we are good
         if (allProductsCache.length > 0) {
             updateStatus('offline', `Modo Offline (${allProductsCache.length} prod)`);
+            showToast('Usando base de datos local', 'info');
         } else {
             updateStatus('offline', 'Modo Offline (Sin datos)');
+            showToast('Error de conexión y sin datos locales', 'error');
         }
         return false;
+    }
+}
+
+async function reloadInventory() {
+    const btn = document.getElementById('btn-reload-inv');
+    const originalText = btn ? btn.innerHTML : '';
+
+    if (btn) {
+        btn.innerHTML = '<span class="material-icons-round spin">sync</span> Cargando...';
+        btn.disabled = true;
+    }
+
+    await checkConnection();
+
+    if (btn) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('Inventario Recargado', 'success');
     }
 }
 
