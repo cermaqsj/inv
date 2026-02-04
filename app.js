@@ -3,10 +3,10 @@
  */
 const CONFIG = {
     // Default API URL from user
-    // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbxfpcRoJLxWyu3LlRRkNHysojwhQNURyB3oP7nFlmZPkErAo9lCYPO9VXpxbcd2Exel/exec',
-    STORAGE_KEY: 'cermaq_inventory_url',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbwfhK_Vbq8gn2i_vTvD-nYXY3ixemPq0iqCDK4tMTJrmGvLJWQefDKDTa6Eg4Pw5PJ7iw/exec',
+    STORAGE_KEY: 'cermaq_inventory_url_v2',
 };
+
 
 let html5QrcodeScanner = null;
 let currentProduct = null;
@@ -20,6 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
+    // FORCE RESET LOGIC (One time execution for v7)
+    const RESET_VERSION = 'v7.0-NUCLEAR';
+    if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_VERSION) {
+        console.log("Executing Nuclear Reset...");
+
+        // 1. Unregister Service Workers
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) registration.unregister();
+            });
+        }
+
+        // 2. Clear Storage
+        localStorage.clear();
+
+        // 3. Mark as done and reload
+        localStorage.setItem('APP_VERSION_CHECK', RESET_VERSION);
+
+        // 4. Force reload from server ignoring cache
+        window.location.reload(true);
+        return;
+    }
+
     checkConnection();
 
     // Setup event listeners
@@ -31,6 +54,26 @@ function initApp() {
     });
 }
 
+async function hardResetApp() {
+    if (!confirm("¿Estás seguro?\nEsto borrará los datos guardados en el dispositivo y recargará la última versión de la App.")) return;
+
+    updateStatus('connecting', 'Limpiando...');
+
+    // 1. Unregister Service Workers
+    if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+            await registration.unregister();
+        }
+    }
+
+    // 2. Clear Local Storage
+    localStorage.clear();
+
+    // 3. Force cache reload
+    window.location.reload(true);
+}
+
 /**
  * API HANDLING
  */
@@ -39,40 +82,130 @@ function getApiUrl() {
 }
 
 async function checkConnection() {
+    // 1. Load from LocalStorage Cache (Primary "Offline" Source)
+    const apiCache = JSON.parse(localStorage.getItem('cermaq_products_cache') || '[]');
+
+    // 2. Load from Hardcoded DB (Secondary/Fallback)
+    let localDB = [];
+    if (typeof OFFLINE_DB !== 'undefined') {
+        localDB = OFFLINE_DB;
+    }
+
+    // 3. Determine Initial State
+    if (apiCache.length > 0) {
+        // Prefer dynamic cache we downloaded previously
+        allProductsCache = apiCache;
+        console.log("Loaded from LocalStorage Cache");
+    } else if (localDB.length > 0) {
+        // Fallback to static DB if cache is empty
+        allProductsCache = localDB;
+        console.log("Loaded from Static OFFLINE_DB");
+    } else {
+        allProductsCache = [];
+        console.log("No Local Data Available");
+    }
+
+    updateStatus('offline', `Base Local (${allProductsCache.length} prod)`);
+
     // Process queue on connect
     if (navigator.onLine) processQueue();
 
+    // 4. Update from Server
     updateStatus('connecting', 'Conectando...');
     try {
-        const response = await fetch(getApiUrl());
+        const apiUrl = getApiUrl();
+        console.log("Fetching from:", apiUrl); // Debug
+
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("API Error");
 
         const data = await response.json();
-        allProductsCache = data; // Cache for search
+
+        // 5. Update Memory & Cache
+        // Since we migrated to a dynamic system, trust the API data fully.
+        // We only merge with localDB if we want to keep "phantom" items not in Sheet, 
+        // but for now, let's keep it clean: API is Truth.
+
+        allProductsCache = data;
+
+        // If we strictly want to keep non-sheet items from OFFLINE_DB:
+        /*
+        if (localDB.length > 0) {
+             // Logic to append items from localDB that are NOT in data
+        }
+        */
+
+        // Save to LocalStorage for next offline session
+        localStorage.setItem('cermaq_products_cache', JSON.stringify(allProductsCache));
 
         // Update queue badge just in case
         const pending = JSON.parse(localStorage.getItem('pending_txs') || '[]');
         updatePendingBadge(pending.length);
 
-        updateStatus('online', `Conectado (${data.length} productos)`);
+        const source = (localDB.length > 0) ? 'API + Static' : 'API Full';
+        updateStatus('online', `En Linea (${allProductsCache.length})`);
         return true;
     } catch (error) {
         console.error(error);
-        updateStatus('offline', 'Modo Offline');
+        // If we failed but have data, we are good
+        if (allProductsCache.length > 0) {
+            updateStatus('offline', `Modo Offline (${allProductsCache.length} prod)`);
+            showToast('Usando base de datos local', 'info');
+        } else {
+            updateStatus('offline', 'Modo Offline (Sin datos)');
+            showToast('Error de conexión y sin datos locales', 'error');
+        }
         return false;
     }
 }
 
-async function fetchProduct(id) {
-    showToast('Buscando producto...', 'info');
-    try {
-        const response = await fetch(getApiUrl());
-        const data = await response.json();
-        return data.find(p => String(p.id) === String(id));
-    } catch (e) {
-        showToast('Error de conexión', 'error');
-        return null;
+async function reloadInventory() {
+    const btn = document.getElementById('btn-reload-inv');
+    const originalText = btn ? btn.innerHTML : '';
+
+    if (btn) {
+        btn.innerHTML = '<span class="material-icons-round spin">sync</span> Cargando...';
+        btn.disabled = true;
     }
+
+    await checkConnection();
+
+    if (btn) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('Inventario Recargado', 'success');
+    }
+}
+
+async function fetchProduct(id) {
+    // 1. Try Cache First (Instant & Offline Friendly)
+    if (allProductsCache && allProductsCache.length > 0) {
+        const cached = allProductsCache.find(p => String(p.id) === String(id));
+        if (cached) {
+            console.log("Producto encontrado en Cache:", cached.nombre);
+            return cached;
+        }
+    }
+
+    // 2. Only if not in cache (and online), try network
+    // This handles cases where a brand new item was added by another user 
+    // and we haven't synced yet.
+    if (navigator.onLine) {
+        showToast('Buscando en servidor...', 'info');
+        try {
+            const response = await fetch(getApiUrl());
+            const data = await response.json();
+
+            // Update cache while we are at it
+            allProductsCache = data;
+
+            return data.find(p => String(p.id) === String(id));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    return null;
 }
 
 async function sendTransaction(payload) {
@@ -146,7 +279,14 @@ async function processQueue() {
 }
 
 // Auto-Sync loop
-setInterval(processQueue, 30000); // Check every 30s
+// Auto-Sync loop
+setInterval(() => {
+    if (navigator.onLine) {
+        processQueue();
+        // Optional: Refresh inventory every 5 minutes if idle? 
+        // For now, we trust initial load + manual refresh if needed.
+    }
+}, 10000); // Check every 10s for faster recovery
 
 /**
  * UI LOGIC
@@ -323,9 +463,11 @@ function renderCart() {
 }
 
 function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartBadge();
-    renderCart();
+    if (confirm('¿Estás seguro de quitar este ítem?')) {
+        cart.splice(index, 1);
+        updateCartBadge();
+        renderCart();
+    }
 }
 
 async function processCart() {
@@ -350,6 +492,22 @@ async function processCart() {
         return;
     }
 
+    // Validation: Password
+    const passInput = document.getElementById('input-clave');
+    const clave = passInput ? passInput.value.trim() : "";
+
+    if (!clave) {
+        showToast("Debes ingresar la contraseña de operario", "error");
+        if (passInput) {
+            passInput.classList.add('error-pulse');
+            setTimeout(() => passInput.classList.remove('error-pulse'), 500);
+            passInput.focus();
+        }
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        return;
+    }
+
     // Save for next time
     localStorage.setItem('last_user_name', user);
 
@@ -363,8 +521,9 @@ async function processCart() {
                 action: item.type,
                 id: item.id,
                 quantity: item.qty,
-                user: user, // Sent here
-                nombre: item.name, // Send name in case of update
+                user: user,
+                clave: clave, // Sending password for security check
+                nombre: item.name,
                 comment: item.comment || "",
                 price: item.price || ""
             });
@@ -388,11 +547,11 @@ async function processCart() {
         cart = [];
         updateCartBadge();
         closeModal();
+        // Clear password for security
+        if (passInput) passInput.value = "";
         checkConnection(); // Refresh global stock
     } else {
-        alert(`Se procesaron ${successCount} ítems correctament, pero hubo errores:\n\n${errors.join('\n')}`);
-        // Remove successful ones? For now, we keep cart for retry or manual clear
-        // Ideally we filter out the successful ones from 'cart' here.
+        alert(`Se procesaron ${successCount} ítems correctamente, pero hubo errores:\n\n${errors.join('\n')}`);
     }
 }
 
@@ -445,44 +604,43 @@ async function handleCreate() {
     } catch (e) {
         showToast('Error al crear producto', 'error');
     }
+}
 
-    async function saveProductName() {
-        if (!currentProduct) return;
+async function saveProductName() {
+    if (!currentProduct) return;
 
-        const newName = document.getElementById('p-name').value.trim();
-        if (newName.length < 3) {
-            showToast("Nombre muy corto", "error");
-            return;
-        }
-
-        const btn = document.getElementById('btn-save-name');
-        btn.innerHTML = '<span class="material-icons-round spin">sync</span>';
-        btn.disabled = true;
-
-        try {
-            const result = await sendTransaction({
-                action: 'UPDATE_NAME',
-                id: currentProduct.id,
-                nombre: newName,
-                user: "WebAdmin"
-            });
-
-            if (result.status === 'success') {
-                showToast('Nombre actualizado', 'success');
-                currentProduct.nombre = newName;
-                checkConnection();
-            } else {
-                showToast('Error al guardar', 'error');
-            }
-        } catch (e) {
-            showToast('Error de conexión', 'error');
-        }
-
-        // Restore button
-        btn.innerHTML = '<span class="material-icons-round">save</span>';
-        btn.disabled = false;
+    const newName = document.getElementById('p-name').value.trim();
+    if (newName.length < 3) {
+        showToast("Nombre muy corto", "error");
+        return;
     }
 
+    const btn = document.getElementById('btn-save-name');
+    btn.innerHTML = '<span class="material-icons-round spin">sync</span>';
+    btn.disabled = true;
+
+    try {
+        const result = await sendTransaction({
+            action: 'UPDATE_NAME',
+            id: currentProduct.id,
+            nombre: newName,
+            user: "WebAdmin"
+        });
+
+        if (result.status === 'success') {
+            showToast('Nombre actualizado', 'success');
+            currentProduct.nombre = newName;
+            checkConnection();
+        } else {
+            showToast('Error al guardar', 'error');
+        }
+    } catch (e) {
+        showToast('Error de conexión', 'error');
+    }
+
+    // Restore button
+    btn.innerHTML = '<span class="material-icons-round">save</span>';
+    btn.disabled = false;
 }
 
 /**
@@ -737,6 +895,18 @@ async function manualInput() {
     }
 }
 
+function openSpreadsheet() {
+    // You can replace this with the exact URL later
+    const url = "";
+    // Ask user for URL if not configured or just open placeholder
+    const userUrl = prompt("Ingresa el Link de tu Google Sheet:", localStorage.getItem('sheet_url') || "");
+
+    if (userUrl) {
+        localStorage.setItem('sheet_url', userUrl);
+        window.open(userUrl, '_blank');
+    }
+}
+
 function adjustQty(amount) {
     const input = document.getElementById('qty-input');
     let currentValue = parseInt(input.value) || 1;
@@ -846,7 +1016,6 @@ function handleSearch() {
             </div>
         `).join('');
         container.style.display = 'block';
-        container.style.display = 'none';
     }
 }
 
