@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnóstico de Verdad V2</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        pre {
+            background: #eee;
+            padding: 10px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🕵️ Herrameinta de Diagnóstico V2</h1>
+    <p>Esta herramienta consulta directamente a tu base de datos (Google Sheets) saltándose la App.</p>
+
+    <div class="card">
+        <h2>1. Configuración Actual</h2>
+        <p><strong>URL API:</strong> <span id="api-url">Cargando...</span></p>
+        <button onclick="runTest()">EJECUTAR PRUEBA DE VERDAD</button>
+    </div>
+
+    <div class="card" id="results" style="display:none;">
+        <h2>2. Resultados de la Nube</h2>
+        <p id="status">Conectando...</p>
+
+        <div id="data-analysis" style="display:none;">
+            <p><strong>Total Productos Recibidos:</strong> <span id="count"
+                    style="font-size: 24px; font-weight: bold;">--</span></p>
+
+            <h3>Primer Producto:</h3>
+            <pre id="first-item">--</pre>
+
+            <h3>Último Producto (El corte):</h3>
+            <pre id="last-item">--</pre>
+
+            <h3>Análisis Rápido:</h3>
+            <p id="analysis-text">--</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Override initApp to not run normal logic
+        window.initApp = function () { };
+
+        document.getElementById('api-url').innerText = CONFIG.DEFAULT_API;
+
+        async function runTest() {
+            const results = document.getElementById('results');
+            const status = document.getElementById('status');
+            const analysis = document.getElementById('data-analysis');
+
+            results.style.display = 'block';
+            status.innerHTML = '⏳ Descargando datos crudos desde Google... (Espera)';
+            status.className = '';
+
+            try {
+                const response = await fetch(CONFIG.DEFAULT_API + '?action=getInventario&t=' + new Date().getTime());
+                const data = await response.json();
+
+                status.innerHTML = '✅ Conexión Exitosa';
+                status.className = 'success';
+                analysis.style.display = 'block';
+
+                document.getElementById('count').innerText = data.length;
+
+                if (data.length > 0) {
+                    document.getElementById('first-item').innerText = JSON.stringify(data[0], null, 2);
+                    document.getElementById('last-item').innerText = JSON.stringify(data[data.length - 1], null, 2);
+
+                    if (data.length < 600) {
+                        document.getElementById('analysis-text').innerHTML =
+                            `<span class="error">¡ALERTA!</span> La API solo entregó ${data.length} filas.<br>` +
+                            `Esto confirma que la App está bien, pero <strong>tu Hoja de Cálculo solo está entregando ${data.length} filas.</strong><br>` +
+                            `Posibles causas:<br>` +
+                            `1. No copiaste todos los datos a la hoja nueva.<br>` +
+                            `2. Copiaste los datos en una pestaña que NO se llama "2026".<br>` +
+                            `3. La columna A (ID) está vacía a partir de la fila ${data.length + 1}.`;
+                    } else {
+                        document.getElementById('analysis-text').innerHTML =
+                            `<span class="success">¡BIEN!</span> La API entregó ${data.length} filas.<br>` +
+                            `Si la App principal sigue mostrando menos, entonces SÍ es un problema de caché local.`;
+                    }
+                }
+
+            } catch (e) {
+                status.innerHTML = '❌ Error de Conexión: ' + e.message;
+                status.className = 'error';
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+
+</html>
