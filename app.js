@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    // FORCE RESET LOGIC (One time execution for v7.5)
-    const RESET_VERSION = 'v7.5-FIX-URL';
+    // FORCE RESET LOGIC (One time execution for v8.4)
+    const RESET_VERSION = 'v8.4-NUCLEAR';
     if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_VERSION) {
         console.log("Executing Nuclear Reset...");
 
