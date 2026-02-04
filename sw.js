@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v7.9-offline-sync';
+const CACHE_NAME = 'cermaq-bodega-v8.0-final-ticks';
 const ASSETS = [
     './',
     './index.html',

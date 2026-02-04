@@ -1126,35 +1126,88 @@ async function loadHistory() {
     const container = document.getElementById('history-list');
     container.innerHTML = '<div style="text-align:center; padding:20px;">Cargando...</div>';
 
-    try {
-        // We reuse sendTransaction logic effectively or just fetch directly
-        // Since custom GET is needed, let's use fetch directly to avoid queue logic usually
-        // Actually, we can just use POST with action GET_HISTORY as defined in Code.gs, 
-        // OR standard GET parameters. 
-        // Based on Code_gs we implemented: doPost handles GET_HISTORY. 
+    // 1. Get Pending Local Items
+    const pending = JSON.parse(localStorage.getItem('pending_txs') || '[]');
+    let html = '';
 
+    // Render Pending (1 Tick)
+    if (pending.length > 0) {
+        html += `<div style="padding: 10px; background: #fff3cd; color: #856404; font-size: 0.9rem; margin-bottom: 10px; border-radius: 8px;">
+            <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle;">hourglass_bottom</span> 
+            Cola de envío (${pending.length})
+        </div>`;
+
+        pending.forEach(item => {
+            html += renderHistoryItem(item, 'pending');
+        });
+    }
+
+    try {
         const response = await fetch(getApiUrl(), {
             method: 'POST',
             body: JSON.stringify({ action: "GET_HISTORY" })
         });
-
         const data = await response.json();
 
-        if (!Array.isArray(data)) {
-            container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error al cargar datos</div>';
-            return;
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                html += renderHistoryItem(item, 'synced');
+            });
         }
-
-        if (data.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:20px;">No hay movimientos recientes.</div>';
-            return;
+    } catch (e) {
+        console.error(e);
+        if (pending.length === 0) {
+            html += '<div style="text-align:center; color:var(--danger)">No se pudo cargar el historial del servidor.</div>';
         }
+    }
 
-        container.innerHTML = data.map(row => {
-            const dateObj = new Date(row.fecha);
-            const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (html === '') {
+        container.innerHTML = '<div style="text-align:center; padding:20px;">No hay movimientos recientes.</div>';
+    } else {
+        container.innerHTML = html;
+    }
+}
 
-            return `
+function renderHistoryItem(item, status) {
+    const isPending = status === 'pending';
+    const icon = isPending ? 'check' : 'done_all';
+    const color = isPending ? '#9ca3af' : '#3b82f6'; // Grey vs Blue
+    const typeClass = item.action === 'IN' ? 'in' : (item.action === 'ADD' ? 'add' : 'out'); // Handle ADD type too if needed
+
+    // Normalize properties (Pending items have different props than server items sometimes)
+    // Server: fecha, accion, id, nombre, cantidad, usuario
+    // Pending: action, id, nombre, quantity, user, timestamp
+
+    const action = item.action || item.accion;
+    const name = item.name || item.nombre;
+    const qty = item.qty || item.quantity || item.cantidad;
+    const user = item.user || item.usuario;
+    const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : new Date(item.fecha).toLocaleDateString();
+
+    return `
+    <div class="cart-item">
+        <div class="cart-item-info">
+            <h4>${name}</h4>
+            <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 2px;">
+                ${dateStr} • ${user}
+            </div>
+        </div>
+        <div class="cart-item-action" style="flex-direction: column; align-items: flex-end;">
+            <span class="tag ${action === 'IN' ? 'in' : 'out'}">${action} ${qty}</span>
+            <span class="material-icons-round" style="color: ${color}; font-size: 1.2rem; margin-top: 5px;" 
+                title="${isPending ? 'En cola (Offline)' : 'Sincronizado'}">
+                ${icon}
+            </span>
+        </div>
+    </div>
+    `;
+}
+
+container.innerHTML = data.map(row => {
+    const dateObj = new Date(row.fecha);
+    const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    return `
             <div class="cart-item" style="flex-direction:column; align-items:flex-start; gap:5px;">
                 <div style="display:flex; justify-content:space-between; width:100%;">
                     <small style="color:#666">${dateStr}</small>
@@ -1167,10 +1220,10 @@ async function loadHistory() {
                 ${row.comentario ? `<div style="font-size:0.85em; color:#555; font-style:italic; background:#f0f0f0; padding:4px; width:100%; border-radius:4px;">"${row.comentario}"</div>` : ''}
             </div>
             `;
-        }).join('');
+}).join('');
 
     } catch (e) {
-        console.error(e);
-        container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error de conexión</div>';
-    }
+    console.error(e);
+    container.innerHTML = '<div style="text-align:center; color:var(--danger)">Error de conexión</div>';
+}
 }
