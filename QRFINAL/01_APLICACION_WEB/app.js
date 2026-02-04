@@ -20,6 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
+    // FORCE RESET LOGIC (One time execution for v7)
+    const RESET_VERSION = 'v7.0-NUCLEAR';
+    if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_VERSION) {
+        console.log("Executing Nuclear Reset...");
+
+        // 1. Unregister Service Workers
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) registration.unregister();
+            });
+        }
+
+        // 2. Clear Storage
+        localStorage.clear();
+
+        // 3. Mark as done and reload
+        localStorage.setItem('APP_VERSION_CHECK', RESET_VERSION);
+
+        // 4. Force reload from server ignoring cache
+        window.location.reload(true);
+        return;
+    }
+
     checkConnection();
 
     // Setup event listeners
@@ -90,7 +113,10 @@ async function checkConnection() {
     // 4. Update from Server
     updateStatus('connecting', 'Conectando...');
     try {
-        const response = await fetch(getApiUrl());
+        const apiUrl = getApiUrl();
+        console.log("Fetching from:", apiUrl); // Debug
+
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("API Error");
 
         const data = await response.json();
