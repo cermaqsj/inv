@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    // FORCE RESET LOGIC (One time execution for v7)
-    const RESET_VERSION = 'v7.0-NUCLEAR';
+    // FORCE RESET LOGIC (One time execution for v7.5)
+    const RESET_VERSION = 'v7.5-FIX-URL';
     if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_VERSION) {
         console.log("Executing Nuclear Reset...");
 
@@ -147,13 +147,14 @@ async function checkConnection() {
         return true;
     } catch (error) {
         console.error(error);
+        const errorMsg = error.message || "Error desconocido";
         // If we failed but have data, we are good
         if (allProductsCache.length > 0) {
-            updateStatus('offline', `Modo Offline (${allProductsCache.length} prod)`);
-            showToast('Usando base de datos local', 'info');
+            updateStatus('offline', `Offline (${allProductsCache.length})`);
+            showToast(`Offline: ${errorMsg}`, 'warning');
         } else {
-            updateStatus('offline', 'Modo Offline (Sin datos)');
-            showToast('Error de conexión y sin datos locales', 'error');
+            updateStatus('offline', 'Modo Offline');
+            showToast(`Error Fatal: ${errorMsg}`, 'error');
         }
         return false;
     }
