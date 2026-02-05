@@ -1180,3 +1180,52 @@ main>*:nth-child(5) {
         padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
     }
 }
+
+/* Quantity Controls (Industrial Fix) */
+.qty-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 1.5rem 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    /* Safe background */
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+}
+
+.qty-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: var(--primary);
+    /* Always Blue */
+    color: white !important;
+    /* Always White Text */
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+
+.qty-btn:active {
+    transform: scale(0.95);
+}
+
+.qty-input {
+    width: 80px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    /* Theme Adaptive */
+    font-family: 'Outfit', sans-serif;
+}
