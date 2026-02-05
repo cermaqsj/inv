@@ -1054,33 +1054,41 @@ function loginAdmin() {
     }
 }
 
+// Search with Debounce (Robustness & Speed)
+let searchTimeout = null;
+
 function handleSearch() {
-    const query = document.getElementById('search-input').value.toLowerCase();
-    const container = document.getElementById('search-results');
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const container = document.getElementById('search-results');
 
-    if (query.length < 2) {
-        container.style.display = 'none';
-        return;
-    }
+        if (query.length < 2) {
+            container.style.display = 'none';
+            return;
+        }
 
-    if (!allProductsCache || allProductsCache.length === 0) {
-        checkConnection();
-    }
+        if (!allProductsCache || allProductsCache.length === 0) {
+            checkConnection();
+        }
 
-    const matches = allProductsCache.filter(p =>
-        String(p.nombre).toLowerCase().includes(query) ||
-        String(p.id).includes(query)
-    ).slice(0, 5);
+        const matches = allProductsCache.filter(p =>
+            String(p.nombre).toLowerCase().includes(query) ||
+            String(p.id).includes(query)
+        ).slice(0, 5);
 
-    if (matches.length > 0) {
-        container.innerHTML = matches.map(p => `
-            <div class="search-item" onclick="openProductModal('${p.id}')">
-                <span>${p.nombre}</span>
-                <span class="tag" style="background:var(--primary); color:white">${p.stock}</span>
-            </div>
-        `).join('');
-        container.style.display = 'block';
-    }
+        if (matches.length > 0) {
+            container.innerHTML = matches.map(p => `
+                <div class="search-item" onclick="openProductModal('${p.id}')">
+                    <span>${p.nombre}</span>
+                    <span class="tag" style="background:var(--primary); color:white; padding: 2px 8px; border-radius: 4px;">STOCK: ${p.stock}</span>
+                </div>
+            `).join('');
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }, 250); // 250ms delay for smoothness
 }
 
 // PWA Install Logic
