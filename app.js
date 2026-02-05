@@ -624,6 +624,17 @@ function onScanSuccess(decodedText) {
     openProductModal(decodedText);
 }
 
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Update Icon
+    const icon = document.getElementById('btn-theme-toggle').querySelector('span');
+    icon.innerText = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+}
+
 async function handleCreate() {
     const id = document.getElementById('new-id').value;
     const name = document.getElementById('new-name').value;

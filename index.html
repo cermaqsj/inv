@@ -36,10 +36,25 @@
 
     <nav>
         <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo">
-        <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()">
-            <span class="material-icons-round">admin_panel_settings</span>
-        </button>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle">
+                <span class="material-icons-round">dark_mode</span>
+            </button>
+            <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()">
+                <span class="material-icons-round">admin_panel_settings</span>
+            </button>
+        </div>
     </nav>
+
+    <!-- Theme Init -->
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        window.addEventListener('DOMContentLoaded', () => {
+            const icon = document.getElementById('btn-theme-toggle').querySelector('span');
+            icon.innerText = savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        });
+    </script>
 
     <main>
         <!-- Status Indicator Centered -->
