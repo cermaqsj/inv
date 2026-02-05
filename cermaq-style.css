@@ -336,11 +336,16 @@ body.admin-mode .admin-only.btn {
 
 /* Glassmorphism Navigation */
 nav {
-    background: var(--glass);
+    /* FORCE DARK BACKGROUND WITH IMAGE */
+    background: url('FONDO.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    /* Ensure readability on top of image */
+    box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.4);
+
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1rem 1.5rem;
     display: flex;
     justify-content: center;
@@ -349,7 +354,7 @@ nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 nav h1 {
@@ -362,14 +367,25 @@ nav h1 {
     position: static;
 }
 
-
-
-/* Reduced logo size for mobile */
+/* FORCE WHITE LOGO ALWAYS */
 .nav-logo {
     height: 32px;
-    /* Smaller */
     width: auto;
     object-fit: contain;
+    filter: brightness(0) invert(1) !important;
+    /* Always white */
+    margin: 0 auto;
+}
+
+/* Override Light Mode specific logo rule if exists */
+[data-theme="light"] .nav-logo {
+    filter: brightness(0) invert(1) !important;
+}
+
+/* FORCE WHITE TEXT IN NAV */
+nav div {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Cleaner Badge */
@@ -1228,4 +1244,101 @@ main>*:nth-child(5) {
     color: var(--text-main);
     /* Theme Adaptive */
     font-family: 'Outfit', sans-serif;
+}
+
+/* --- EPIC ANIMATIONS (v9.11) --- */
+
+/* 1. Holographic Sheen for Primary Buttons */
+@keyframes sheen {
+    0% {
+        transform: translateX(-150%) skewX(-20deg);
+    }
+
+    100% {
+        transform: translateX(200%) skewX(-20deg);
+    }
+}
+
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    /* Contain the shine */
+    z-index: 1;
+}
+
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+    transition: none;
+}
+
+.btn-primary:hover::after {
+    animation: sheen 0.8s ease;
+}
+
+/* 2. Neon Data Stream for Banner (Nav) */
+@keyframes borderFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+nav {
+    border-bottom: none !important;
+    /* Remove static border */
+}
+
+nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), #a855f7, var(--accent), var(--primary));
+    background-size: 300% 300%;
+    animation: borderFlow 4s linear infinite;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.6);
+}
+
+/* 3. Breathing Logo */
+@keyframes logoPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) brightness(0) invert(1);
+        transform: scale(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 15px rgba(14, 165, 233, 0.5)) brightness(0) invert(1);
+        transform: scale(1.03);
+    }
+}
+
+/* Apply pulse only in Dark Mode (Light mode logo needs color) */
+[data-theme="dark"] .nav-logo {
+    animation: logoPulse 5s ease-in-out infinite;
+}
+
+/* 4. Epic Button Active State */
+.btn:active {
+    transform: scale(0.92) !important;
+    /* Deeper press */
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
