@@ -34,6 +34,32 @@
     --radius: 24px;
 }
 
+/* --- LIGHT MODE PALETTE (Industrial Day) --- */
+[data-theme="light"] {
+    --bg-dark: #f1f5f9;
+    /* Slate 100 */
+    --bg-mesh: radial-gradient(circle at 50% 0%, #e2e8f0 0%, #f1f5f9 80%);
+
+    --glass-base: rgba(255, 255, 255, 0.85);
+    /* Frosty White */
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-highlight: rgba(255, 255, 255, 0.8);
+
+    --text-main: #0f172a;
+    /* Slate 900 (Black-ish) */
+    --text-muted: #64748b;
+    /* Slate 500 */
+
+    --primary: #0284c7;
+    /* Sky 600 (Darker for contrast) */
+    --primary-dim: #bae6fd;
+    --primary-glow: rgba(14, 165, 233, 0.15);
+
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+    /* Softer shadow */
+}
+
 /* GLOBAL RESET & BASE */
 body {
     font-family: 'Outfit', sans-serif;

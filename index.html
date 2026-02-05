@@ -13,7 +13,7 @@
     <!-- Local Styles -->
     <!-- Local Styles -->
     <!-- Local Styles (Renamed to force cache refresh) -->
-    <link rel="stylesheet" href="cermaq-style.css?v=9.4">
+    <link rel="stylesheet" href="cermaq-style.css?v=9.5">
 
     <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
@@ -94,7 +94,10 @@
                     if (this.y > canvas.height) this.y = 0;
                 }
                 draw() {
-                    ctx.fillStyle = this.baseColor;
+                    const theme = document.documentElement.getAttribute('data-theme');
+                    // Dark Mode: White particles | Light Mode: Dark Navy particles
+                    ctx.fillStyle = theme === 'light' ? 'rgba(15, 23, 42, 0.4)' : this.baseColor;
+
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -113,7 +116,8 @@
                 });
 
                 // Connections
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // More visible lines
+                const theme = document.documentElement.getAttribute('data-theme');
+                ctx.strokeStyle = theme === 'light' ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.15)';
                 ctx.lineWidth = 0.8;
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
@@ -250,7 +254,7 @@
                 Si no funciona, busca "Instalar" en el menú de tu navegador.
             </p>
             <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-light); opacity: 0.6;">
-                v9.4 Search Turbo
+                v9.5 Day/Night Perfect
             </div>
         </div>
 
