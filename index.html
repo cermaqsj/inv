@@ -35,12 +35,21 @@
 <body>
 
     <nav>
-        <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo">
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle">
+        <div style="text-align: center;">
+            <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo">
+            <div
+                style="font-size: 0.7rem; color: var(--accent); font-weight: 700; letter-spacing: 1px; margin-top: 4px; text-transform: uppercase;">
+                Bodega Stna. Juana
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 5px;">
+            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle"
+                style="border: 1px solid var(--glass-border); border-radius: 50%;">
                 <span class="material-icons-round">dark_mode</span>
             </button>
-            <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()">
+            <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()"
+                style="border: 1px solid var(--glass-border); border-radius: 50%;">
                 <span class="material-icons-round">admin_panel_settings</span>
             </button>
         </div>

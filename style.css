@@ -20,13 +20,36 @@
     --accent: #00A9E0;
     --success: #34d399;
     --danger: #f87171;
-    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-    --surface: rgba(30, 41, 59, 0.95);
-    --glass: rgba(15, 23, 42, 0.85);
+    --bg-gradient: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    /* Deeper blue/black gradient */
+    --surface: rgba(30, 41, 59, 0.6);
+    /* More transparent cards like glass */
+    --glass: rgba(15, 23, 42, 0.9);
     --glass-border: rgba(255, 255, 255, 0.1);
-    --text: #f1f5f9;
+    --text: #ffffff;
     --text-light: #94a3b8;
     --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Header Centering Logic */
+nav {
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 0.5rem;
+}
+
+.nav-logo {
+    height: 40px;
+    /* Bigger logo */
+    filter: brightness(0) invert(1);
+    /* Force white logo in dark mode logic (default) */
+    margin: 0 auto;
+}
+
+/* Light Mode Override for logo */
+[data-theme="light"] .nav-logo {
+    filter: none;
+    /* Original colors */
 }
 
 body {
