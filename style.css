@@ -122,6 +122,17 @@ nav h1 {
     backdrop-filter: blur(4px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #1e293b;
+    /* ALWAYS DARK TEXT for white pill */
+}
+
+/* ... skipped ... */
+
+.btn-secondary {
+    background: white;
+    color: #1e293b;
+    /* ALWAYS DARK TEXT for white button */
+    border: 1px solid #e2e8f0;
 }
 
 main {
