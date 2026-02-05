@@ -13,7 +13,7 @@
     <!-- Local Styles -->
     <!-- Local Styles -->
     <!-- Local Styles (Renamed to force cache refresh) -->
-    <link rel="stylesheet" href="cermaq-style.css?v=9.1">
+    <link rel="stylesheet" href="cermaq-style.css?v=9.2">
 
     <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
@@ -35,16 +35,17 @@
 </head>
 
 <body>
-    <!-- Background Particles (Z-Index 0 to sit on top of body bg but behind content) -->
+    <!-- Background Particles (Z-Index 0) -->
     <canvas id="bg-particles"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6;"></canvas>
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.8;"></canvas>
 
     <script>
-        // Minimal Industrial Particle System
+        // MASTERPIECE INTERACTIVE PARTICLE SYSTEM
         (function () {
             const canvas = document.getElementById('bg-particles');
             const ctx = canvas.getContext('2d');
             let particles = [];
+            let mouse = { x: null, y: null };
 
             function resize() {
                 canvas.width = window.innerWidth;
@@ -53,33 +54,55 @@
             window.addEventListener('resize', resize);
             resize();
 
+            // Track Mouse/Touch
+            window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+            window.addEventListener('touchstart', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+            window.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
+
             class Particle {
                 constructor() {
                     this.x = Math.random() * canvas.width;
                     this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.5; // Slow movement
+                    this.vx = (Math.random() - 0.5) * 0.5;
                     this.vy = (Math.random() - 0.5) * 0.5;
                     this.size = Math.random() * 2 + 1;
+                    this.baseColor = 'rgba(255, 255, 255, 0.15)'; // Brighter base
                 }
                 update() {
                     this.x += this.vx;
                     this.y += this.vy;
+
+                    // Mouse Interaction (Magnet/Repel)
+                    if (mouse.x != null) {
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 150) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (150 - distance) / 150;
+                            // Gentle repulsion
+                            this.vx -= forceDirectionX * force * 0.05;
+                            this.vy -= forceDirectionY * force * 0.05;
+                        }
+                    }
+
+                    // Wrap around screen
                     if (this.x < 0) this.x = canvas.width;
                     if (this.x > canvas.width) this.x = 0;
                     if (this.y < 0) this.y = canvas.height;
                     if (this.y > canvas.height) this.y = 0;
                 }
                 draw() {
-                    const theme = document.documentElement.getAttribute('data-theme');
-                    ctx.fillStyle = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,75,141,0.05)';
+                    ctx.fillStyle = this.baseColor;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
 
-            // Init particles
-            const count = Math.min(window.innerWidth / 15, 60); // Responsive count
+            // Init particles (Dense but light)
+            const count = Math.min(window.innerWidth / 10, 80);
             for (let i = 0; i < count; i++) particles.push(new Particle());
 
             function animate() {
@@ -89,17 +112,15 @@
                     p.draw();
                 });
 
-                // Draw Connections (Industrial Web)
-                const theme = document.documentElement.getAttribute('data-theme');
-                ctx.strokeStyle = theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,75,141,0.02)';
-                ctx.lineWidth = 1;
-
+                // Connections
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 0.5;
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
                         const dy = particles[i].y - particles[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 100) {
+                        if (dist < 120) {
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
@@ -229,7 +250,7 @@
                 Si no funciona, busca "Instalar" en el menú de tu navegador.
             </p>
             <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-light); opacity: 0.6;">
-                v9.1 Premium UI
+                v9.2 Masterpiece Edition
             </div>
         </div>
 
