@@ -60,6 +60,10 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    overscroll-behavior: none;
+    /* Prevent bounce */
 }
 
 /* Admin Toggle Logic */
