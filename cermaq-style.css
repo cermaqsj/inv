@@ -32,6 +32,11 @@
     --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.15);
     --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
     --radius: 24px;
+
+    /* Default Hover (Dark Mode) */
+    --btn-hover-text: #ffffff;
+    --btn-hover-bg: rgba(255, 255, 255, 0.15);
+    --btn-hover-border: rgba(255, 255, 255, 0.4);
 }
 
 /* --- LIGHT MODE PALETTE (Industrial Day) --- */
@@ -58,6 +63,11 @@
 
     --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
     /* Softer shadow */
+
+    /* Hover Overrides for Light Mode */
+    --btn-hover-text: #0f172a;
+    --btn-hover-bg: rgba(0, 0, 0, 0.05);
+    --btn-hover-border: rgba(0, 0, 0, 0.1);
 }
 
 /* GLOBAL RESET & BASE */
