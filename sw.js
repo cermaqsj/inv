@@ -1,8 +1,8 @@
-const CACHE_NAME = 'cermaq-bodega-v8.7-final-fix';
+const CACHE_NAME = 'cermaq-bodega-v9.4-turbo';
 const ASSETS = [
     './',
     './index.html',
-    './style.css',
+    './cermaq-style.css', /* Renamed from style.css */
     './app.js',
     './products.js',
     './Cermaq_logo2.png',
