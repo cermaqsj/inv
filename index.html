@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
     <!-- Local Styles -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="style.css?v=8.9">
 
     <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
@@ -33,9 +34,9 @@
 </head>
 
 <body>
-    <!-- Background Particles -->
+    <!-- Background Particles (Z-Index 0 to sit on top of body bg but behind content) -->
     <canvas id="bg-particles"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.4;"></canvas>
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6;"></canvas>
 
     <script>
         // Minimal Industrial Particle System
