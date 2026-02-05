@@ -126,9 +126,12 @@ nav {
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
+    color: #ffffff !important;
+    /* FIX: Force bright white text on hover */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 /* Success / Danger with Glows */

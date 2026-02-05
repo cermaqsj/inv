@@ -13,7 +13,7 @@
     <!-- Local Styles -->
     <!-- Local Styles -->
     <!-- Local Styles (Renamed to force cache refresh) -->
-    <link rel="stylesheet" href="cermaq-style.css?v=9.2">
+    <link rel="stylesheet" href="cermaq-style.css?v=9.3">
 
     <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
@@ -66,7 +66,7 @@
                     this.vx = (Math.random() - 0.5) * 0.5;
                     this.vy = (Math.random() - 0.5) * 0.5;
                     this.size = Math.random() * 2 + 1;
-                    this.baseColor = 'rgba(255, 255, 255, 0.15)'; // Brighter base
+                    this.baseColor = 'rgba(255, 255, 255, 0.5)'; // Much brighter (User request)
                 }
                 update() {
                     this.x += this.vx;
@@ -113,8 +113,8 @@
                 });
 
                 // Connections
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // More visible lines
+                ctx.lineWidth = 0.8;
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
@@ -250,7 +250,7 @@
                 Si no funciona, busca "Instalar" en el menú de tu navegador.
             </p>
             <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--text-light); opacity: 0.6;">
-                v9.2 Masterpiece Edition
+                v9.3 High Visibility
             </div>
         </div>
 
