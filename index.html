@@ -44,9 +44,20 @@
     <main>
         <!-- Status Indicator Centered -->
         <!-- Status Indicator Centered -->
-        <div class="status-pill">
-            <span id="status-dot" class="dot"></span>
-            <span id="status-text">Iniciando...</span>
+        <!-- Status Indicator & Sheet Button -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+            <div class="status-pill" style="margin: 0;">
+                <span id="status-dot" class="dot"></span>
+                <span id="status-text">Iniciando...</span>
+            </div>
+
+            <!-- Redirect via Backend to hide URL -->
+            <button
+                onclick="window.open(localStorage.getItem('cermaq_inventory_url_v2') ? localStorage.getItem('cermaq_inventory_url_v2') + '?action=openSheet' : 'https://script.google.com/macros/s/AKfycbzEuelRESo4zL-ZvYLwUcZQPT7jnEQ0z5g8pUz2HhPlKMJEtNvQvQz_14dSbUU35qAqdA/exec?action=openSheet', '_blank')"
+                style="display: flex; align-items: center; gap: 6px; background: white; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 50px; font-weight: 600; color: #10b981; box-shadow: 0 4px 12px rgba(0, 75, 141, 0.15); cursor: pointer;">
+                <span class="material-icons-round">table_view</span>
+                <span style="font-size: 0.85rem;">Planilla</span>
+            </button>
         </div>
 
         <!-- Scanner Section -->
@@ -95,13 +106,7 @@
             <span class="material-icons-round">history</span> Ver Historial
         </button>
 
-        <!-- Admin Utilities Row -->
-        <div class="admin-only" style="margin-top: 1rem;">
-            <button class="btn btn-secondary" onclick="openSpreadsheet()"
-                style="width: 100%; border-color: #10b981; color: #10b981;">
-                <span class="material-icons-round">table_view</span> Ver Planilla Google Sheets
-            </button>
-        </div>
+
 
         <!-- Install App Section (Universally Visible at Bottom) -->
         <div id="install-container" style="margin-top: 2rem; text-align: center; display: block;">

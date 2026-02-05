@@ -8,13 +8,22 @@ const KOL = {
 
 const HOJA_INVENTARIO = "2026"; // Asegúrate que tu hoja se llame así o cambia este nombre
 const HOJA_LOGS = "MOVIMIENTOS";
+// URL DE LA PLANILLA (Privada en el Backend)
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1IRRlhN0hQa0ryJ2SNcyyRpkKbuZ8uaFmiw6w82EozCo/edit";
 
 // ==========================================
 // API DEL SISTEMA (No tocar)
 // ==========================================
 
 function doGet(e) {
-  // Esta función entrega la lista de productos al Escáner
+  // 1. REDIRECCIÓN SEGURA A PLANILLA
+  if (e.parameter.action === "openSheet") {
+    return HtmlService.createHtmlOutput(
+      '<script>window.top.location.href = "' + SHEET_URL + '";</script>'
+    ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
+  // 2. INVENTARIO NORMAL
   const data = obtenerInventario();
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
