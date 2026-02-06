@@ -35,6 +35,25 @@
 </head>
 
 <body>
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h3>Cargando Recursos...</h3>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            // Small buffer to ensure rendering checks out
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500); // Wait for transition
+            }, 300); // 300ms buffer
+        });
+    </script>
     <!-- Background Particles (Z-Index 0) -->
     <canvas id="bg-particles"
         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.8;"></canvas>
