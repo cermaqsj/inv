@@ -83,6 +83,8 @@ body {
     overflow-x: hidden;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
+    /* Smooth Theme Transition */
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --- GLASSMORPHISM CARDS --- */
@@ -365,6 +367,13 @@ nav .icon-btn {
     border-color: rgba(255, 255, 255, 0.5) !important;
     color: #ffffff !important;
     background: transparent !important;
+    /* Force Circular Shape */
+    border-radius: 50% !important;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 nav .icon-btn span {
@@ -672,42 +681,7 @@ main {
     line-height: 1;
 }
 
-/* Quantity Controls */
-.qty-control {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #f1f5f9;
-    border-radius: 50px;
-    padding: 5px;
-    margin-bottom: 2rem;
-}
-
-.qty-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: white;
-    border: none;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.qty-input {
-    background: transparent;
-    border: none;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text);
-    width: 80px;
-    font-family: inherit;
-}
+/* OLD Duplicate .qty-control block removed */
 
 /* Inputs */
 .input-group {
@@ -971,7 +945,7 @@ main>*:nth-child(5) {
     }
 }
 
-/* Quantity Controls (Industrial Fix) */
+/* Quantity Controls (Improved Contrast) */
 .qty-control {
     display: flex;
     align-items: center;
@@ -979,10 +953,15 @@ main>*:nth-child(5) {
     gap: 15px;
     margin: 1.5rem 0;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.05);
-    /* Safe background */
+    /* Darker background in dark mode for contrast */
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 16px;
     border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .qty-control {
+    background: #f1f5f9;
+    /* Light gray in light mode */
 }
 
 .qty-btn {
@@ -1018,6 +997,36 @@ main>*:nth-child(5) {
     color: var(--text-main);
     /* Theme Adaptive */
     font-family: 'Outfit', sans-serif;
+}
+
+/* FAB - Restored & Polished */
+.fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--primary) !important;
+    /* Force primary color */
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 75, 141, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.fab:active {
+    transform: scale(0.9);
+}
+
+.fab:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 75, 141, 0.6);
 }
 
 /* --- EPIC ANIMATIONS (v9.11) --- */
