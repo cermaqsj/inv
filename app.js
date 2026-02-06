@@ -467,9 +467,9 @@ function renderCart() {
             <div class="cart-item-action" style="flex-direction: column; align-items: flex-end; gap: 5px;">
                 <span class="tag ${item.type === 'IN' ? 'in' : 'out'}" style="margin: 0;">${item.type}</span>
                 
-                <div class="cart-qty-wrapper" style="display: flex; align-items: center; gap: 5px; background: #f3f4f6; padding: 2px; border-radius: 6px;">
+                <div class="cart-qty-wrapper">
                     <button class="qty-mini-btn" onclick="updateCartQty(${index}, -1)">-</button>
-                    <span style="font-weight: 600; min-width: 20px; text-align: center;">${item.qty}</span>
+                    <span class="cart-qty-display">${item.qty}</span>
                     <button class="qty-mini-btn" onclick="updateCartQty(${index}, 1)">+</button>
                 </div>
 

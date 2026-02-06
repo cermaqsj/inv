@@ -1029,6 +1029,46 @@ main>*:nth-child(5) {
     box-shadow: 0 8px 25px rgba(0, 75, 141, 0.6);
 }
 
+/* Cart Mini Quantity Controls */
+.cart-qty-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .cart-qty-wrapper {
+    background: #e2e8f0;
+}
+
+.qty-mini-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: white;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cart-qty-display {
+    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+    color: var(--text-main);
+    /* Theme aware text */
+    font-size: 0.9rem;
+}
+
 /* --- EPIC ANIMATIONS (v9.11) --- */
 
 /* 1. Holographic Sheen for Primary Buttons */
