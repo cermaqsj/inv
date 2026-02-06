@@ -594,7 +594,7 @@ async function processCart() {
     btn.disabled = false;
 
     if (errors.length === 0) {
-        showToast(`¡Éxito! ${successCount} movimientos procesados.`, 'success');
+        showToast('Se ingresó correctamente, completado!', 'success');
         cart = [];
         updateCartBadge();
         closeModal();
@@ -659,7 +659,7 @@ async function handleCreate() {
         });
 
         if (result.status === 'success' || result.status === 'offline') {
-            showToast(result.status === 'offline' ? 'Guardado offline' : 'Producto creado OK', 'success');
+            showToast(result.status === 'offline' ? 'Guardado offline' : 'Se ingresó correctamente', 'success');
             checkConnection();
         } else {
             showToast('Error: ' + result.message, 'error');
