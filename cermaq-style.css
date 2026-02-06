@@ -90,10 +90,12 @@ body {
 .modal-content,
 nav {
     background: var(--glass-surface) !important;
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    /* Reduced blur for performance (was 16px) */
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-card);
+    /* Simple shadow instead of complex one */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-radius: var(--radius);
     position: relative;
     overflow: hidden;
@@ -343,8 +345,9 @@ nav {
     /* Ensure readability on top of image - DARKER OVERLAY (0.7) */
     box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.7) !important;
 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur (was 12px) */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1rem 1.5rem;
     display: flex;
@@ -1088,24 +1091,8 @@ nav::after {
 }
 
 /* 3. Breathing Logo */
-@keyframes logoPulse {
-
-    0%,
-    100% {
-        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) brightness(0) invert(1);
-        transform: scale(1);
-    }
-
-    50% {
-        filter: drop-shadow(0 0 15px rgba(14, 165, 233, 0.5)) brightness(0) invert(1);
-        transform: scale(1.03);
-    }
-}
-
-/* Apply pulse only in Dark Mode (Light mode logo needs color) */
-[data-theme="dark"] .nav-logo {
-    animation: logoPulse 5s ease-in-out infinite;
-}
+/* 3. Breathing Logo - REMOVED for performance */
+/* [data-theme="dark"] .nav-logo { animation: logoPulse ... } */
 
 /* 4. Epic Button Active State */
 .btn:active {

@@ -41,11 +41,17 @@
 
     <script>
         // MASTERPIECE INTERACTIVE PARTICLE SYSTEM
+        // MASTERPIECE INTERACTIVE PARTICLE SYSTEM - OPTIMIZED V2
         (function () {
             const canvas = document.getElementById('bg-particles');
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { alpha: true }); // optimize
             let particles = [];
             let mouse = { x: null, y: null };
+
+            // Detect low power / mobile
+            const isMobile = window.innerWidth < 768;
+            const particleCount = isMobile ? 25 : 50; // Drastically reduced count
+            const connectDistance = isMobile ? 0 : 120; // Disable lines on mobile
 
             function resize() {
                 canvas.width = window.innerWidth;
@@ -54,7 +60,7 @@
             window.addEventListener('resize', resize);
             resize();
 
-            // Track Mouse/Touch
+            // Track Mouse/Touch - Throttled slightly by browser events
             window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
             window.addEventListener('touchstart', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
             window.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
@@ -63,27 +69,26 @@
                 constructor() {
                     this.x = Math.random() * canvas.width;
                     this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.5;
-                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.vx = (Math.random() - 0.5) * 0.3; // Slower, calmer
+                    this.vy = (Math.random() - 0.5) * 0.3;
                     this.size = Math.random() * 2 + 1;
-                    this.baseColor = 'rgba(255, 255, 255, 0.5)'; // Much brighter (User request)
+                    this.baseColor = 'rgba(255, 255, 255, 0.5)';
                 }
                 update() {
                     this.x += this.vx;
                     this.y += this.vy;
 
-                    // Mouse Interaction (Magnet/Repel)
+                    // Mouse Interaction (Simplified)
                     if (mouse.x != null) {
                         let dx = mouse.x - this.x;
                         let dy = mouse.y - this.y;
                         let distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < 150) {
-                            const forceDirectionX = dx / distance;
-                            const forceDirectionY = dy / distance;
-                            const force = (150 - distance) / 150;
-                            // Gentle repulsion
-                            this.vx -= forceDirectionX * force * 0.05;
-                            this.vy -= forceDirectionY * force * 0.05;
+                        if (distance < 100) { // Reduced radius
+                            const force = (100 - distance) / 100;
+                            const dxNormal = dx / distance;
+                            const dyNormal = dy / distance;
+                            this.vx -= dxNormal * force * 0.05;
+                            this.vy -= dyNormal * force * 0.05;
                         }
                     }
 
@@ -94,41 +99,58 @@
                     if (this.y > canvas.height) this.y = 0;
                 }
                 draw() {
-                    const theme = document.documentElement.getAttribute('data-theme');
-                    // Dark Mode: White particles | Light Mode: Dark Navy particles
-                    ctx.fillStyle = theme === 'light' ? 'rgba(15, 23, 42, 0.4)' : this.baseColor;
+                    // Cache theme check outside loop ideally, but this is okay for small N
+                    // We assume dark mode mostly for the particles as per banner request? 
+                    // No, keeping dynamic but simple.
+                    ctx.fillStyle = this.baseColor;
 
+                    // Simple circle
                     ctx.beginPath();
+                    // Optimization: Use rects instead of arcs for tiny particles? No, Arcs look better.
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
 
-            // Init particles (Dense but light)
-            const count = Math.min(window.innerWidth / 10, 80);
-            for (let i = 0; i < count; i++) particles.push(new Particle());
+            // Init particles
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
 
-                // Connections
                 const theme = document.documentElement.getAttribute('data-theme');
-                ctx.strokeStyle = theme === 'light' ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.15)';
-                ctx.lineWidth = 0.8;
+                const isLight = theme === 'light';
+
+                // Set style once per frame
+                ctx.fillStyle = isLight ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.4)';
+                ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 0.5;
+
                 for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
+                    let p = particles[i];
+                    p.update();
+
+                    // Inline draw to reuse fillStyle
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Efficient Connections (only if not mobile)
+                    if (!isMobile) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            let p2 = particles[j];
+                            let dx = p.x - p2.x;
+                            let dy = p.y - p2.y;
+                            // Pre-check rect to avoid sqrt
+                            if (Math.abs(dx) < connectDistance && Math.abs(dy) < connectDistance) {
+                                let dist = Math.sqrt(dx * dx + dy * dy);
+                                if (dist < connectDistance) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(p.x, p.y);
+                                    ctx.lineTo(p2.x, p2.y);
+                                    ctx.stroke();
+                                }
+                            }
                         }
                     }
                 }
