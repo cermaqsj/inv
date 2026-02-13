@@ -1250,8 +1250,8 @@ function switchToolTab(tab) {
     currentToolTab = tab;
 
     // UI Toggles
-    document.getElementById('view-loan').style.display = tab === 'loan' ? 'block' : 'none';
-    document.getElementById('view-active').style.display = tab === 'active' ? 'block' : 'none';
+    document.getElementById('view-tool-loan').style.display = tab === 'loan' ? 'block' : 'none';
+    document.getElementById('view-tool-active').style.display = tab === 'active' ? 'block' : 'none';
 
     // Btn Styles - HIGH CONTRAST FOR ACCESSIBILITY (OLDER USERS)
     // Active: Primary Color + White Text + Thick Border
