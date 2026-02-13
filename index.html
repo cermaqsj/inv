@@ -25,7 +25,23 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="products.js?v=6"></script> <!-- OFFLINE DB -->
-    <script src="app.js?v=7" defer></script>
+    <script src="app.js?v=9.7-DEBUG" defer></script>
+
+    <!-- FORCE SW UPDATE -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.update();
+                }
+            });
+            // Force reload if version mismatch (simple check)
+            if (!localStorage.getItem('DEBUG_RELOAD_7')) {
+                localStorage.setItem('DEBUG_RELOAD_7', 'true');
+                setTimeout(() => window.location.reload(true), 1500);
+            }
+        }
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
