@@ -1272,11 +1272,10 @@ function switchToolTab(tab) {
         applyStyle(loanBtn, inactiveStyle);
         applyStyle(activeBtn, activeStyle);
     }
-}
 
-if (tab === 'active') {
-    fetchTools();
-}
+    if (tab === 'active') {
+        fetchTools();
+    }
 }
 
 function applyStyle(el, style) {
