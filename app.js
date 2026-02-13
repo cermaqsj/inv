@@ -1245,19 +1245,21 @@ function switchToolTab(tab) {
     // Inactive: Darker Background (not transparent) + White Text + Visible Border
 
     const activeStyle = {
-        bg: 'var(--primary)',
-        color: 'white',
+        bg: 'var(--primary)', // Bright Blue
+        color: '#ffffff',     // Pure White
         border: '2px solid var(--primary)',
-        fontWeight: 'bold',
-        opacity: '1'
+        fontWeight: '800',    // Extra Bold
+        opacity: '1',
+        boxShadow: '0 0 10px rgba(14, 165, 233, 0.4)' // Glow effect for active
     };
 
     const inactiveStyle = {
-        bg: 'rgba(255, 255, 255, 0.15)', // More visible than 0.05
-        color: 'var(--text-main)',      // Ensuring high contrast
-        border: '2px solid rgba(255, 255, 255, 0.3)', // Visible border
-        fontWeight: 'normal',
-        opacity: '0.8'
+        bg: '#334155',        // Solid Slate 700 (Dark Grey) - NO TRANSPARENCY
+        color: '#e2e8f0',     // Light Grey (almost white)
+        border: '2px solid #475569', // Slate 600 Border
+        fontWeight: '600',    // Semi Bold
+        opacity: '1',         // NO TRANSPARENCY
+        boxShadow: 'none'
     };
 
     const loanBtn = document.getElementById('tab-loan');
@@ -1270,10 +1272,6 @@ function switchToolTab(tab) {
         applyStyle(loanBtn, inactiveStyle);
         applyStyle(activeBtn, activeStyle);
     }
-
-    if (tab === 'active') {
-        fetchTools();
-    }
 }
 
 function applyStyle(el, style) {
@@ -1282,6 +1280,7 @@ function applyStyle(el, style) {
     el.style.border = style.border;
     el.style.fontWeight = style.fontWeight;
     el.style.opacity = style.opacity;
+    el.style.boxShadow = style.boxShadow;
 }
 
 async function registerToolOut() {
