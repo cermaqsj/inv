@@ -1274,6 +1274,11 @@ function switchToolTab(tab) {
     }
 }
 
+if (tab === 'active') {
+    fetchTools();
+}
+}
+
 function applyStyle(el, style) {
     el.style.background = style.bg;
     el.style.color = style.color;
