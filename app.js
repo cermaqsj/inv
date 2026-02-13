@@ -1351,11 +1351,17 @@ async function registerToolOut() {
             document.getElementById('tool-comment').value = "";
             // Switch to list to see it
             switchToolTab('active');
+            isToolSubmitting = false;
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
         } else {
             showToast("Error: " + (result.message || result.error || "Desconocido"), "error");
+            isToolSubmitting = false;
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
         }
     } catch (e) {
         showToast("Error de conexión: " + e.message, "error");
+        isToolSubmitting = false;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
     }
 }
 
