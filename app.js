@@ -1300,11 +1300,16 @@ function applyStyle(el, style) {
     el.style.boxShadow = style.boxShadow;
 }
 
+// Global flag
+let isToolSubmitting = false;
+
 async function registerToolOut() {
+    if (isToolSubmitting) return;
     const worker = document.getElementById('tool-worker').value.trim();
     const area = document.getElementById('tool-area').value.trim();
     const tool = document.getElementById('tool-name').value.trim();
     const comment = document.getElementById('tool-comment').value.trim();
+    const submitBtn = document.getElementById('btn-tool-submit');
 
     if (worker.length < 3 || tool.length < 2) {
         showToast("Nombre y Herramienta son obligatorios", "error");
@@ -1320,7 +1325,12 @@ async function registerToolOut() {
         comment: comment
     };
 
-    showToast("Registrando préstamo...", "info");
+    isToolSubmitting = true;
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-icons-round spin">sync</span>';
+    }
+    showToast("Registrando...", "info");
 
     // Send to Backend
     try {
