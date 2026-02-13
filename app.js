@@ -1228,9 +1228,22 @@ function renderHistoryItem(item, status) {
 let toolsCache = [];
 let currentToolTab = 'loan';
 
-function openToolsModal() {
-    document.getElementById('modal-tools').classList.add('active');
-    switchToolTab('loan'); // Default tab
+function openToolsApp() {
+    // Switch Views
+    document.getElementById('view-home').style.display = 'none';
+    document.getElementById('view-tools').style.display = 'block';
+
+    // Default Tab
+    switchToolTab('loan');
+
+    // Reset Scroll
+    window.scrollTo(0, 0);
+}
+
+function closeToolsApp() {
+    document.getElementById('view-tools').style.display = 'none';
+    document.getElementById('view-home').style.display = 'block';
+    window.scrollTo(0, 0);
 }
 
 function switchToolTab(tab) {
