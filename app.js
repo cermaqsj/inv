@@ -1240,18 +1240,48 @@ function switchToolTab(tab) {
     document.getElementById('view-loan').style.display = tab === 'loan' ? 'block' : 'none';
     document.getElementById('view-active').style.display = tab === 'active' ? 'block' : 'none';
 
-    // Btn Styles
-    document.getElementById('tab-loan').style.background = tab === 'loan' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
-    document.getElementById('tab-loan').style.color = tab === 'loan' ? 'white' : 'var(--text-main)';
-    document.getElementById('tab-loan').style.border = tab === 'loan' ? '1px solid var(--primary)' : '1px solid var(--glass-border)';
+    // Btn Styles - HIGH CONTRAST FOR ACCESSIBILITY (OLDER USERS)
+    // Active: Primary Color + White Text + Thick Border
+    // Inactive: Darker Background (not transparent) + White Text + Visible Border
 
-    document.getElementById('tab-active').style.background = tab === 'active' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
-    document.getElementById('tab-active').style.color = tab === 'active' ? 'white' : 'var(--text-main)';
-    document.getElementById('tab-active').style.border = tab === 'active' ? '1px solid var(--primary)' : '1px solid var(--glass-border)';
+    const activeStyle = {
+        bg: 'var(--primary)',
+        color: 'white',
+        border: '2px solid var(--primary)',
+        fontWeight: 'bold',
+        opacity: '1'
+    };
+
+    const inactiveStyle = {
+        bg: 'rgba(255, 255, 255, 0.15)', // More visible than 0.05
+        color: 'var(--text-main)',      // Ensuring high contrast
+        border: '2px solid rgba(255, 255, 255, 0.3)', // Visible border
+        fontWeight: 'normal',
+        opacity: '0.8'
+    };
+
+    const loanBtn = document.getElementById('tab-loan');
+    const activeBtn = document.getElementById('tab-active');
+
+    if (tab === 'loan') {
+        applyStyle(loanBtn, activeStyle);
+        applyStyle(activeBtn, inactiveStyle);
+    } else {
+        applyStyle(loanBtn, inactiveStyle);
+        applyStyle(activeBtn, activeStyle);
+    }
 
     if (tab === 'active') {
         fetchTools();
     }
+}
+
+function applyStyle(el, style) {
+    el.style.background = style.bg;
+    el.style.color = style.color;
+    el.style.border = style.border;
+    el.style.fontWeight = style.fontWeight;
+    el.style.opacity = style.opacity;
 }
 
 async function registerToolOut() {
