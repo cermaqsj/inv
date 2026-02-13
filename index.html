@@ -227,99 +227,160 @@
     </script>
 
     <main>
-        <!-- Status Indicator Centered -->
-        <!-- Status Indicator Centered -->
-        <!-- Status Indicator & Sheet Button -->
-        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-            <div class="status-pill" style="margin: 0;">
-                <span id="status-dot" class="dot"></span>
-                <span id="status-text">Iniciando...</span>
+        <!-- VIEW: HOME (The Grid) -->
+        <div id="view-home">
+            <!-- Status Indicator Centered -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+                <div class="status-pill" style="margin: 0;">
+                    <span id="status-dot" class="dot"></span>
+                    <span id="status-text">Iniciando...</span>
+                </div>
+
+                <!-- Tool Tracking Button (Navigation) -->
+                <button onclick="openToolsApp()"
+                    style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; color: #ef4444; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer; padding: 0;">
+                    <span class="material-icons-round" style="font-size: 24px;">construction</span>
+                </button>
+
+                <!-- Direct Link to Sheet -->
+                <button
+                    onclick="window.open('https://docs.google.com/spreadsheets/d/1IRRlhN0hQa0ryJ2SNcyyRpkKbuZ8uaFmiw6w82EozCo/edit?usp=sharing', '_blank')"
+                    style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; color: #10b981; box-shadow: 0 4px 12px rgba(0, 75, 141, 0.15); cursor: pointer; padding: 0;">
+                    <span class="material-icons-round" style="font-size: 24px;">cloud</span>
+                </button>
             </div>
 
+            <!-- Scanner Section -->
+            <div class="card">
+                <div class="scanner-wrapper">
+                    <div id="reader"></div>
+                    <div class="scan-overlay">
+                        <span class="material-icons-round"
+                            style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.8;">qr_code_scanner</span>
+                        <p style="margin: 0; font-size: 1.1rem;">Apunta a un código QR</p>
+                    </div>
+                </div>
 
-            <!-- Tool Tracking Button -->
-            <button onclick="openToolsModal()"
-                style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; color: #ef4444; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer; padding: 0;">
-                <span class="material-icons-round" style="font-size: 24px;">construction</span>
+                <button class="btn btn-primary" id="btn-scan-start" style="width: 100%; margin-top: 1.5rem;">
+                    <span class="material-icons-round">camera_alt</span>
+                    <span id="btn-scan-text">ACTIVAR CÁMARA</span>
+                </button>
+            </div>
+
+            <!-- Quick Actions & Search -->
+            <div style="margin-top: 1rem;">
+                <div class="input-group" style="margin-bottom: 0.5rem;">
+                    <input type="text" id="search-input" class="input-field" placeholder="🔍 Buscar por Nombre o ID..."
+                        onkeyup="handleSearch()">
+                </div>
+                <div id="search-results" class="search-results" style="display:none;"></div>
+            </div>
+
+            <div class="grid-cols-2" style="margin-top: 1rem;">
+                <button class="btn btn-secondary admin-only" onclick="openCreateModal()">
+                    <span class="material-icons-round">add_circle</span> Crear
+                </button>
+                <button class="btn btn-secondary admin-only" onclick="window.open('FICHAS_IMPRESION.html', '_blank')">
+                    <span class="material-icons-round">qr_code_2</span> Etiquetas
+                </button>
+            </div>
+
+            <button class="btn btn-secondary" id="btn-reload-inv" onclick="reloadInventory()"
+                style="width: 100%; margin-top: 1rem; border-color: var(--primary); color: var(--primary);">
+                <span class="material-icons-round">cloud_sync</span> Recargar Inventario
             </button>
 
-            <!-- Redirect via Backend to hide URL -->
-            <!-- Direct Link to Sheet (User requested direct access) -->
-            <button
-                onclick="window.open('https://docs.google.com/spreadsheets/d/1IRRlhN0hQa0ryJ2SNcyyRpkKbuZ8uaFmiw6w82EozCo/edit?usp=sharing', '_blank')"
-                style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; color: #10b981; box-shadow: 0 4px 12px rgba(0, 75, 141, 0.15); cursor: pointer; padding: 0;">
-                <span class="material-icons-round" style="font-size: 24px;">cloud</span>
+            <button class="btn btn-secondary" onclick="openHistoryModal()" style="width: 100%; margin-top: 1rem;">
+                <span class="material-icons-round">history</span> Ver Historial
             </button>
+
+            <!-- Install App Section -->
+            <div id="install-container" style="margin-top: 2rem; text-align: center; display: block;">
+                <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente? y
+                    ¿Problemas?
+                </p>
+                <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                    <button class="btn btn-primary" id="btn-install" onclick="installPWA()"
+                        style="flex: 1; min-width: 120px; box-shadow: none;">
+                        <span class="material-icons-round">download_for_offline</span> Instalar
+                    </button>
+                    <button class="btn btn-secondary" onclick="hardResetApp()"
+                        style="flex: 1; min-width: 120px; background: #ef4444; color: white; border: none;">
+                        <span class="material-icons-round">refresh</span> Actualizar
+                    </button>
+                </div>
+                <p id="install-msg"
+                    style="display:none; color: var(--text-light); font-size: 0.8rem; margin-top: 0.5rem;">
+                    Si no funciona, busca "Instalar" en el menú de tu navegador.
+                </p>
+            </div>
         </div>
 
-        <!-- Scanner Section -->
-        <div class="card">
-            <div class="scanner-wrapper">
-                <div id="reader"></div>
-                <div class="scan-overlay">
-                    <span class="material-icons-round"
-                        style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.8;">qr_code_scanner</span>
-                    <p style="margin: 0; font-size: 1.1rem;">Apunta a un código QR</p>
+        <!-- VIEW: TOOLS (Independent Full Screen) -->
+        <div id="view-tools" style="display: none; padding-bottom: 80px;">
+            <div class="product-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <button class="icon-btn" onclick="closeToolsApp()"
+                    style="background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <h2 style="display:block; font-size: 1.3rem; margin:0;">Control Herramientas</h2>
+                <div style="width: 40px;"></div> <!-- Spacer -->
+            </div>
+
+            <!-- Tabs -->
+            <div
+                style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                <button class="btn btn-secondary" id="tab-loan" onclick="switchToolTab('loan')"
+                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PRÉSTAMO</button>
+                <button class="btn btn-secondary" id="tab-active" onclick="switchToolTab('active')"
+                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PENDIENTE</button>
+            </div>
+
+            <!-- Tab: Loan (Form) -->
+            <div id="view-tool-loan" style="flex: 1;">
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Trabajador / Responsable</label>
+                        <input type="text" id="tool-worker" class="input-field" placeholder="Nombre completo">
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Área</label>
+                        <input type="text" id="tool-area" class="input-field" placeholder="Ej. Smolt">
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Herramienta / Insumo</label>
+                        <input type="text" id="tool-name" class="input-field"
+                            placeholder="Ej. Pistola de Impacto DeWALT">
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Comentario (Opcional)</label>
+                        <input type="text" id="tool-comment" class="input-field" placeholder="Detalle estado o motivo">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-tool-submit" onclick="registerToolOut()"
+                    style="width: 100%; margin-top: 1rem; padding: 1.2rem; font-size: 1.1rem; font-weight: bold;">
+                    <span class="material-icons-round">output</span> REGISTRAR SALIDA
+                </button>
+            </div>
+
+            <!-- Tab: Active & History (List) -->
+            <div id="view-tool-active" style="display: none; flex: 1;">
+                <div id="tool-list-container" class="cart-list">
+                    <div style="text-align: center; color: var(--text-light); padding: 2rem;">Cargando...</div>
                 </div>
             </div>
-
-            <button class="btn btn-primary" id="btn-scan-start" style="width: 100%; margin-top: 1.5rem;">
-                <span class="material-icons-round">camera_alt</span>
-                <span id="btn-scan-text">ACTIVAR CÁMARA</span>
-            </button>
         </div>
-
-        <!-- Quick Actions -->
-        <!-- Quick Actions & Search -->
-        <div style="margin-top: 1rem;">
-            <div class="input-group" style="margin-bottom: 0.5rem;">
-                <input type="text" id="search-input" class="input-field" placeholder="🔍 Buscar por Nombre o ID..."
-                    onkeyup="handleSearch()">
-            </div>
-            <div id="search-results" class="search-results" style="display:none;"></div>
-        </div>
-
-        <div class="grid-cols-2" style="margin-top: 1rem;">
-            <!-- Removed Manual button as Search replaces it -->
-            <button class="btn btn-secondary admin-only" onclick="openCreateModal()">
-                <span class="material-icons-round">add_circle</span> Crear
-            </button>
-            <button class="btn btn-secondary admin-only" onclick="window.open('FICHAS_IMPRESION.html', '_blank')">
-                <span class="material-icons-round">qr_code_2</span> Etiquetas
-            </button>
-        </div>
-
-        <button class="btn btn-secondary" id="btn-reload-inv" onclick="reloadInventory()"
-            style="width: 100%; margin-top: 1rem; border-color: var(--primary); color: var(--primary);">
-            <span class="material-icons-round">cloud_sync</span> Recargar Inventario
-        </button>
-
-        <button class="btn btn-secondary" onclick="openHistoryModal()" style="width: 100%; margin-top: 1rem;">
-            <span class="material-icons-round">history</span> Ver Historial
-        </button>
-
-
-
-        <!-- Install App Section (Universally Visible at Bottom) -->
-        <div id="install-container" style="margin-top: 2rem; text-align: center; display: block;">
-            <p style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">¿Uso frecuente? y ¿Problemas?
-            </p>
-            <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                <button class="btn btn-primary" id="btn-install" onclick="installPWA()"
-                    style="flex: 1; min-width: 120px; box-shadow: none;">
-                    <span class="material-icons-round">download_for_offline</span> Instalar
-                </button>
-                <button class="btn btn-secondary" onclick="hardResetApp()"
-                    style="flex: 1; min-width: 120px; background: #ef4444; color: white; border: none;">
-                    <span class="material-icons-round">refresh</span> Actualizar
-                </button>
-            </div>
-            <p id="install-msg" style="display:none; color: var(--text-light); font-size: 0.8rem; margin-top: 0.5rem;">
-                Si no funciona, busca "Instalar" en el menú de tu navegador.
-            </p>
-
-        </div>
-
     </main>
 
     <!-- Toast Container -->
@@ -505,56 +566,7 @@
         </div>
     </div>
 
-    <!-- Tool Tracking Modal -->
-    <div class="modal-backdrop" id="modal-tools">
-        <div class="modal-content" style="height: 95vh; display: flex; flex-direction: column;">
-            <div class="product-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="display:block; font-size: 1.2rem;">Control Herramientas</h2>
-                <button class="icon-btn" onclick="closeModal()"><span class="material-icons-round">close</span></button>
-            </div>
-
-            <!-- Tabs -->
-            <div
-                style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
-                <button class="btn btn-secondary" id="tab-loan" onclick="switchToolTab('loan')"
-                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PRÉSTAMO</button>
-                <button class="btn btn-secondary" id="tab-active" onclick="switchToolTab('active')"
-                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PENDIENTE</button>
-            </div>
-
-            <!-- Tab: Loan (Form) -->
-            <div id="view-loan" style="flex: 1; overflow-y: auto;">
-                <div class="input-group">
-                    <label class="input-label">Trabajador / Responsable</label>
-                    <input type="text" id="tool-worker" class="input-field" placeholder="Nombre completo">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Área</label>
-                    <input type="text" id="tool-area" class="input-field" placeholder="Ej. Smolt">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Herramienta / Insumo</label>
-                    <input type="text" id="tool-name" class="input-field" placeholder="Ej. Pistola de Impacto DeWALT">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Comentario (Opcional)</label>
-                    <input type="text" id="tool-comment" class="input-field" placeholder="Detalle estado o motivo">
-                </div>
-
-                <button class="btn btn-primary" onclick="registerToolOut()" style="width: 100%; margin-top: 1rem;">
-                    <span class="material-icons-round">output</span> REGISTRAR SALIDA
-                </button>
-            </div>
-
-            <!-- Tab: Active & History (List) -->
-            <div id="view-active" style="display: none; flex: 1; overflow-y: auto;">
-                <div id="tool-list-container" class="cart-list">
-                    <div style="text-align: center; color: var(--text-light); padding: 2rem;">Cargando...</div>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    <!-- Tools Modal Removed (Converted to View) -->
 
     <!-- Floating Action Button for Cart -->
     <button id="fab-cart" class="fab" onclick="openCartModal()">
