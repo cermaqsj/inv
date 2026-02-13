@@ -958,15 +958,19 @@ async function manualInput() {
     }
 }
 
-function openSpreadsheet() {
-    // You can replace this with the exact URL later
-    const url = "";
-    // Ask user for URL if not configured or just open placeholder
-    const userUrl = prompt("Ingresa el Link de tu Google Sheet:", localStorage.getItem('sheet_url') || "");
-
-    if (userUrl) {
-        localStorage.setItem('sheet_url', userUrl);
-        window.open(userUrl, '_blank');
+function openSheetSecure() {
+    // 1. Check if Admin
+    if (isAdmin) {
+        // If Admin, open immediately
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1IRRlhN0hQa0ryJ2SNcyyRpkKbuZ8uaFmiw6w82EozCo/edit?usp=sharing';
+        window.open(sheetUrl, '_blank');
+    } else {
+        // If not, trigger login
+        // We can use a custom flag to know we want to open sheet after login, 
+        // OR just simple: "Log in first, then click again".
+        // Let's go with simple first:
+        showToast("Acceso restringido. Inicia sesión como Admin.", "warning");
+        toggleAdmin();
     }
 }
 
