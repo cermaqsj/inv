@@ -3,7 +3,7 @@
 const KOL = {
   ID: 0,          // Columna A: Nº ARTICULO
   NOMBRE: 1,      // Columna B: DESCRIPCION
-  STOCK: 3        // Columna D: STOCK
+  STOCK: 2        // Columna C: STOCK (Antes 3/D)
 };
 
 const HOJA_INVENTARIO = "2026"; // Asegúrate que tu hoja se llame así o cambia este nombre
@@ -43,6 +43,10 @@ function doPost(e) {
       return obtenerHistorial(params);
     } else if (accion === "UPDATE_NAME") {
       return actualizarNombre(params);
+    } else if (accion === "TOOL_CHECK_OUT" || accion === "TOOL_CHECK_IN") {
+      return procesarHerramienta(params);
+    } else if (accion === "GET_TOOLS") {
+      return obtenerHerramientas();
     } else {
       return respuestaJSON({ error: "Acción no válida" });
     }
@@ -174,15 +178,11 @@ function agregarProducto(datos) {
   }
   
   // Agregar fila nueva
-  // Estructura: [ID, NOMBRE, UNIDAD, STOCK, CATEGORIA, PRECIO, VALORIZADO]
+  // Estructura SIMPLIFICADA: [ID, NOMBRE, STOCK]
   sheet.appendRow([
-    idNuevo,            // A (Usamos el ID calculado o asignado)
+    idNuevo,            // A
     datos.nombre,       // B
-    "UNIDAD",           // C (Default)
-    datos.stock || 0,   // D
-    "GENERAL",          // E (Categoría default)
-    datos.precio || 0,  // F
-    ""                  // G
+    datos.stock || 0    // C (Stock directo, sin columnas intermedias)
   ]);
   
   return respuestaJSON({ 
@@ -341,4 +341,99 @@ function actualizarNombre(datos) {
   sheet.getRange(filaEncontrada, KOL.NOMBRE + 1).setValue(datos.nombre);
   
   return respuestaJSON({ status: "success", message: "Nombre actualizado" });
+}
+
+// ==========================================
+// CONTROL DE HERRAMIENTAS
+// ==========================================
+const HOJA_HERRAMIENTAS = "CONTROL_HERRAMIENTAS";
+
+function procesarHerramienta(datos) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(HOJA_HERRAMIENTAS);
+  
+  // Crear hoja si no existe
+  if (!sheet) {
+    sheet = ss.insertSheet(HOJA_HERRAMIENTAS);
+    sheet.appendRow(["ID_TRANSACCION", "FECHA_SALIDA", "WORKER_OBRA", "AREA", "HERRAMIENTA", "ESTADO", "FECHA_DEVOLUCION", "COMENTARIO"]);
+    sheet.setTabColor("red");
+  }
+  
+  const timestamp = new Date();
+  
+  if (datos.action === "TOOL_CHECK_OUT") {
+    const idTransaccion = "TX-" + Math.floor(Math.random() * 1000000);
+    
+    sheet.appendRow([
+      idTransaccion,
+      timestamp,
+      datos.worker,
+      datos.area,
+      datos.tool,
+      "PENDING", // Estado: Pendiente de devolución
+      "",        // Fecha devolución vacía
+      datos.comment || ""
+    ]);
+    
+    return respuestaJSON({ status: "success", message: "Préstamo registrado", id: idTransaccion });
+  } 
+  
+  else if (datos.action === "TOOL_CHECK_IN") {
+    const data = sheet.getDataRange().getValues();
+    const idBusqueda = datos.id;
+    let filaEncontrada = -1;
+    
+    // Buscar transacción
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === idBusqueda) {
+        filaEncontrada = i + 1;
+        break;
+      }
+    }
+    
+    if (filaEncontrada === -1) return respuestaJSON({ status: "error", message: "Transacción no encontrada" });
+    
+    // Actualizar Estado y Fecha Devolución
+    sheet.getRange(filaEncontrada, 6).setValue("RETURNED");
+    sheet.getRange(filaEncontrada, 7).setValue(timestamp);
+    
+    return respuestaJSON({ status: "success", message: "Herramienta devuelta" });
+  }
+  
+  return respuestaJSON({ status: "error", message: "Acción no válida" });
+}
+
+function obtenerHerramientas() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(HOJA_HERRAMIENTAS);
+  
+  if (!sheet) return respuestaJSON([]);
+  
+  const data = sheet.getDataRange().getValues();
+  const herramientas = [];
+  
+  // Devolver todo (o filtrar últimos 100 para optimizar)
+  // Estructura: [ID, FECHA_OUT, WORKER, AREA, TOOL, ESTADO, FECHA_IN, COMMENT]
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    herramientas.push({
+      id: row[0],
+      fechaOut: row[1],
+      worker: row[2],
+      area: row[3],
+      tool: row[4],
+      estado: row[5],
+      fechaIn: row[6],
+      comment: row[7]
+    });
+  }
+  
+  // Ordenar: Pendientes primero, luego por fecha más reciente
+  herramientas.sort((a, b) => {
+    if (a.estado === "PENDING" && b.estado !== "PENDING") return -1;
+    if (a.estado !== "PENDING" && b.estado === "PENDING") return 1;
+    return new Date(b.fechaOut) - new Date(a.fechaOut);
+  });
+  
+  return respuestaJSON(herramientas);
 }

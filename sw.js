@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cermaq-bodega-v9.4-turbo';
+const CACHE_NAME = 'cermaq-bodega-v9.5-tools';
 const ASSETS = [
     './',
     './index.html',

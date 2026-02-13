@@ -3,13 +3,13 @@
  */
 const CONFIG = {
     // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbzC7YS7jYDOdwmq1C_9LhJu2uO1kvc--NnIz-qHAlnGkNaog0f8HTtG0lhQiz-lkglQ_Q/exec',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbznNWfhsRb_gqLpVVOZgfBSda7Kfk_n9PIirB4aCrGDgPsmNMkYBThd4oAJ4kUjqw-M5w/exec',
     STORAGE_KEY: 'cermaq_inventory_url_v2',
 };
 
 // --- EMERGENCY RESET (RUNS IMMEDIATELY) ---
 (function () {
-    const RESET_KEY = 'v8.6-RESCUE';
+    const RESET_KEY = 'v9.6-TOOLS-DEPLOY';
     try {
         if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_KEY) {
             console.warn("EXECUTING EMERGENCY RESET: " + RESET_KEY);
@@ -1220,4 +1220,165 @@ function renderHistoryItem(item, status) {
         </div>
     </div>
     `;
+}
+
+/**
+ * TOOL TRACKING SYSTEM
+ */
+let toolsCache = [];
+let currentToolTab = 'loan';
+
+function openToolsModal() {
+    document.getElementById('modal-tools').classList.add('active');
+    switchToolTab('loan'); // Default tab
+}
+
+function switchToolTab(tab) {
+    currentToolTab = tab;
+
+    // UI Toggles
+    document.getElementById('view-loan').style.display = tab === 'loan' ? 'block' : 'none';
+    document.getElementById('view-active').style.display = tab === 'active' ? 'block' : 'none';
+
+    // Btn Styles
+    document.getElementById('tab-loan').style.background = tab === 'loan' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('tab-loan').style.color = tab === 'loan' ? 'white' : 'var(--text-main)';
+
+    document.getElementById('tab-active').style.background = tab === 'active' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('tab-active').style.color = tab === 'active' ? 'white' : 'var(--text-main)';
+
+    if (tab === 'active') {
+        fetchTools();
+    }
+}
+
+async function registerToolOut() {
+    const worker = document.getElementById('tool-worker').value.trim();
+    const area = document.getElementById('tool-area').value.trim();
+    const tool = document.getElementById('tool-name').value.trim();
+    const comment = document.getElementById('tool-comment').value.trim();
+
+    if (worker.length < 3 || tool.length < 2) {
+        showToast("Nombre y Herramienta son obligatorios", "error");
+        return;
+    }
+
+    // Creating payload
+    const payload = {
+        action: 'TOOL_CHECK_OUT',
+        worker: worker,
+        area: area,
+        tool: tool,
+        comment: comment
+    };
+
+    showToast("Registrando préstamo...", "info");
+
+    // Send to Backend
+    try {
+        const result = await sendTransaction(payload);
+
+        if (result.status === 'success' || result.status === 'offline') {
+            showToast("Préstamo registrado exitosamente", "success");
+            // Clear form
+            document.getElementById('tool-name').value = "";
+            document.getElementById('tool-comment').value = "";
+            // Switch to list to see it
+            switchToolTab('active');
+        } else {
+            showToast("Error: " + result.message, "error");
+        }
+    } catch (e) {
+        showToast("Error de conexión", "error");
+    }
+}
+
+async function fetchTools() {
+    const container = document.getElementById('tool-list-container');
+    container.innerHTML = '<div style="text-align: center; padding: 2rem;"><span class="material-icons-round spin">sync</span> Cargando...</div>';
+
+    try {
+        const response = await fetch(getApiUrl() + '?action=getInventario'); // We trigger GET, but actually we need a POST or modified GET
+        // Wait, standard GET only returns Inventory. We need to use POST for custom actions usually in this setup 
+        // OR modify doGet. 
+        // Let's use sendTransaction with action GET_TOOLS for consistency with the rest of the app's logic
+
+        const result = await sendTransaction({ action: 'GET_TOOLS' });
+
+        // sendTransaction returns parsed JSON directly
+        toolsCache = result;
+        renderToolList(toolsCache);
+
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger);">Error al cargar historial.</div>';
+    }
+}
+
+function renderToolList(rows) {
+    const container = document.getElementById('tool-list-container');
+    container.innerHTML = '';
+
+    if (!rows || rows.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-light);">No hay registros recientes.</div>';
+        return;
+    }
+
+    rows.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'flex-start';
+
+        const isPending = item.estado === 'PENDING';
+        const dateStr = new Date(item.fechaOut).toLocaleDateString() + ' ' + new Date(item.fechaOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0; color: var(--primary);">${item.tool}</h4>
+                    <div style="font-size: 0.85rem; color: var(--text-main); margin-top: 4px;">
+                        <span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">person</span> ${item.worker}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-light);">
+                        ${item.area} • ${dateStr}
+                    </div>
+                </div>
+                <div>
+                    <span class="tag ${isPending ? 'out' : 'in'}">${isPending ? 'PENDIENTE' : 'DEVUELTO'}</span>
+                </div>
+            </div>
+            
+            ${item.comment ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; font-style: italic;">"${item.comment}"</div>` : ''}
+
+            ${isPending ? `
+            <button class="btn btn-secondary" onclick="returnTool('${item.id}')" style="width: 100%; margin-top: 10px; padding: 0.5rem; font-size: 0.9rem;">
+                <span class="material-icons-round">assignment_return</span> MARCAR DEVOLUCIÓN
+            </button>
+            ` : ''}
+        `;
+        container.appendChild(div);
+    });
+}
+
+async function returnTool(txId) {
+    if (!confirm("¿Confirmar recepción de esta herramienta?")) return;
+
+    showToast("Procesando devolución...", "info");
+
+    try {
+        const result = await sendTransaction({
+            action: 'TOOL_CHECK_IN',
+            id: txId
+        });
+
+        if (result.status === 'success') {
+            showToast("Devolución registrada", "success");
+            fetchTools(); // Refresh list
+        } else {
+            showToast("Error: " + result.message, "error");
+        }
+    } catch (e) {
+        showToast("Error de conexión", "error");
+    }
 }
