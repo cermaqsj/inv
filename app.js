@@ -1278,6 +1278,14 @@ async function registerToolOut() {
     try {
         const result = await sendTransaction(payload);
 
+        // DEBUG: Mostrar respuesta exacta del servidor
+        // Esto confirmará si es la versión vieja o nueva
+        if (!result.status && result.error) {
+            alert("Error del Servidor: " + result.error + "\n(Estás usando una versión vieja del script)");
+        } else if (result.status !== 'success' && result.status !== 'offline') {
+            alert("Respuesta del Servidor: " + JSON.stringify(result));
+        }
+
         if (result.status === 'success' || result.status === 'offline') {
             showToast("Préstamo registrado exitosamente", "success");
             // Clear form
@@ -1286,10 +1294,10 @@ async function registerToolOut() {
             // Switch to list to see it
             switchToolTab('active');
         } else {
-            showToast("Error: " + result.message, "error");
+            showToast("Error: " + (result.message || result.error || "Desconocido"), "error");
         }
     } catch (e) {
-        showToast("Error de conexión", "error");
+        showToast("Error de conexión: " + e.message, "error");
     }
 }
 
