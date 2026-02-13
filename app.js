@@ -3,13 +3,13 @@
  */
 const CONFIG = {
     // Default API URL from user
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbznNWfhsRb_gqLpVVOZgfBSda7Kfk_n9PIirB4aCrGDgPsmNMkYBThd4oAJ4kUjqw-M5w/exec',
+    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbw-uXGY9Thidg9nT5DYinYhQUt64NMZw9AvIBsV6pAYtT8dc-wW4rR9wTPUUB10EtmRXQ/exec',
     STORAGE_KEY: 'cermaq_inventory_url_v2',
 };
 
 // --- EMERGENCY RESET (RUNS IMMEDIATELY) ---
 (function () {
-    const RESET_KEY = 'v9.6-TOOLS-DEPLOY';
+    const RESET_KEY = 'v9.7-TOOLS-FIX';
     try {
         if (localStorage.getItem('APP_VERSION_CHECK') !== RESET_KEY) {
             console.warn("EXECUTING EMERGENCY RESET: " + RESET_KEY);
