@@ -1241,11 +1241,13 @@ function switchToolTab(tab) {
     document.getElementById('view-active').style.display = tab === 'active' ? 'block' : 'none';
 
     // Btn Styles
-    document.getElementById('tab-loan').style.background = tab === 'loan' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('tab-loan').style.background = tab === 'loan' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
     document.getElementById('tab-loan').style.color = tab === 'loan' ? 'white' : 'var(--text-main)';
+    document.getElementById('tab-loan').style.border = tab === 'loan' ? '1px solid var(--primary)' : '1px solid var(--glass-border)';
 
-    document.getElementById('tab-active').style.background = tab === 'active' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('tab-active').style.background = tab === 'active' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
     document.getElementById('tab-active').style.color = tab === 'active' ? 'white' : 'var(--text-main)';
+    document.getElementById('tab-active').style.border = tab === 'active' ? '1px solid var(--primary)' : '1px solid var(--glass-border)';
 
     if (tab === 'active') {
         fetchTools();
