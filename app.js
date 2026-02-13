@@ -1246,19 +1246,19 @@ function switchToolTab(tab) {
 
     const activeStyle = {
         bg: 'var(--primary)', // Bright Blue
-        color: '#ffffff',     // Pure White
+        color: '#ffffff',     // Pure White ALWAYS
         border: '2px solid var(--primary)',
         fontWeight: '800',    // Extra Bold
         opacity: '1',
-        boxShadow: '0 0 10px rgba(14, 165, 233, 0.4)' // Glow effect for active
+        boxShadow: '0 0 10px rgba(14, 165, 233, 0.4)'
     };
 
     const inactiveStyle = {
-        bg: '#334155',        // Solid Slate 700 (Dark Grey) - NO TRANSPARENCY
-        color: '#e2e8f0',     // Light Grey (almost white)
-        border: '2px solid #475569', // Slate 600 Border
-        fontWeight: '600',    // Semi Bold
-        opacity: '1',         // NO TRANSPARENCY
+        bg: '#334155',        // Solid Slate 700
+        color: '#ffffff',     // Pure White ALWAYS (User Request)
+        border: '2px solid #475569',
+        fontWeight: '600',
+        opacity: '1',
         boxShadow: 'none'
     };
 
