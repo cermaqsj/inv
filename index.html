@@ -237,7 +237,7 @@
                 </div>
 
                 <!-- Tool Tracking Button (Navigation) -->
-                <button onclick="openToolsApp()"
+                <button onclick="window.location.href='registro_herramientas.html'"
                     style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; color: #ef4444; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer; padding: 0;">
                     <span class="material-icons-round" style="font-size: 24px;">construction</span>
                 </button>
@@ -315,71 +315,7 @@
             </div>
         </div>
 
-        <!-- VIEW: TOOLS (Independent Full Screen) -->
-        <div id="view-tools" style="display: none; padding-bottom: 80px;">
-            <div class="product-header"
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <button class="icon-btn" onclick="closeToolsApp()"
-                    style="background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                    <span class="material-icons-round">arrow_back</span>
-                </button>
-                <h2 style="display:block; font-size: 1.3rem; margin:0;">Control Herramientas</h2>
-                <div style="width: 40px;"></div> <!-- Spacer -->
-            </div>
-
-            <!-- Tabs -->
-            <div
-                style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
-                <button class="btn btn-secondary" id="tab-loan" onclick="switchToolTab('loan')"
-                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PRÉSTAMO</button>
-                <button class="btn btn-secondary" id="tab-active" onclick="switchToolTab('active')"
-                    style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PENDIENTE</button>
-            </div>
-
-            <!-- Tab: Loan (Form) -->
-            <div id="view-tool-loan" style="flex: 1;">
-                <div class="card" style="margin-bottom: 1rem;">
-                    <div class="input-group">
-                        <label class="input-label">Trabajador / Responsable</label>
-                        <input type="text" id="tool-worker" class="input-field" placeholder="Nombre completo">
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 1rem;">
-                    <div class="input-group">
-                        <label class="input-label">Área</label>
-                        <input type="text" id="tool-area" class="input-field" placeholder="Ej. Smolt">
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 1rem;">
-                    <div class="input-group">
-                        <label class="input-label">Herramienta / Insumo</label>
-                        <input type="text" id="tool-name" class="input-field"
-                            placeholder="Ej. Pistola de Impacto DeWALT">
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 1rem;">
-                    <div class="input-group">
-                        <label class="input-label">Comentario (Opcional)</label>
-                        <input type="text" id="tool-comment" class="input-field" placeholder="Detalle estado o motivo">
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" id="btn-tool-submit" onclick="registerToolOut()"
-                    style="width: 100%; margin-top: 1rem; padding: 1.2rem; font-size: 1.1rem; font-weight: bold;">
-                    <span class="material-icons-round">output</span> REGISTRAR SALIDA
-                </button>
-            </div>
-
-            <!-- Tab: Active & History (List) -->
-            <div id="view-tool-active" style="display: none; flex: 1;">
-                <div id="tool-list-container" class="cart-list">
-                    <div style="text-align: center; color: var(--text-light); padding: 2rem;">Cargando...</div>
-                </div>
-            </div>
-        </div>
+        <!-- VIEW: TOOLS (Moved to bitacora.html) -->
     </main>
 
     <!-- Toast Container -->

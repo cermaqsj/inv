@@ -5,6 +5,8 @@ const ASSETS = [
     './cermaq-style.css', /* Renamed from style.css */
     './app.js',
     './products.js',
+    './registro_herramientas.html', /* Standalone Tools Log */
+    './registro_herramientas.js',
     './Cermaq_logo2.png',
     './Q.png',
     './manifest.json',
