@@ -443,15 +443,19 @@ function obtenerHerramientas() {
 // BITÁCORA MANTENCIÓN
 // ==========================================
 
-// ID de la Hoja de Mantención (REEMPLAZAR CON EL ID REAL)
-// Ejemplo: "1AbCdEfGhIjKlMnOpQrStUvWxYz123456"
-const HOJA_MANTENCION_ID = "REEMPLAZAR_CON_TU_ID_AQUI"; 
+// ID de la Hoja de Mantención
+const HOJA_MANTENCION_ID = "1KFCkva7EhMKEajaGaigPIeNWt4vJVs_1KbJxwErDe44"; 
 
 function procesarBitacoraMantencion(datos) {
   // datos = { workier, tasks: [], action: 'MAINTENANCE_LOG' }
   try {
     const ssExterno = SpreadsheetApp.openById(HOJA_MANTENCION_ID);
-    const sheet = ssExterno.getSheets()[0]; // Usar la primera hoja
+    let sheet = ssExterno.getSheetByName("MANTENCIÓN");
+    
+    // Si no existe, usar la primera
+    if (!sheet) {
+      sheet = ssExterno.getSheets()[0];
+    }
     
     // Si la hoja está vacía, poner encabezados
     if (sheet.getLastRow() === 0) {
