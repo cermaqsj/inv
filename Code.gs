@@ -47,6 +47,8 @@ function doPost(e) {
       return procesarHerramienta(params);
     } else if (accion === "GET_TOOLS") {
       return obtenerHerramientas();
+    } else if (accion === "MAINTENANCE_LOG") {
+      return procesarBitacoraMantencion(params);
     } else {
       return respuestaJSON({ error: "Acción no válida" });
     }
@@ -436,4 +438,58 @@ function obtenerHerramientas() {
   });
   
   return respuestaJSON(herramientas);
+}
+// ==========================================
+// BITÁCORA MANTENCIÓN
+// ==========================================
+
+// ID de la Hoja de Mantención (REEMPLAZAR CON EL ID REAL)
+// Ejemplo: "1AbCdEfGhIjKlMnOpQrStUvWxYz123456"
+const HOJA_MANTENCION_ID = "REEMPLAZAR_CON_TU_ID_AQUI"; 
+
+function procesarBitacoraMantencion(datos) {
+  // datos = { workier, tasks: [], action: 'MAINTENANCE_LOG' }
+  try {
+    const ssExterno = SpreadsheetApp.openById(HOJA_MANTENCION_ID);
+    const sheet = ssExterno.getSheets()[0]; // Usar la primera hoja
+    
+    // Si la hoja está vacía, poner encabezados
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["ID", "FECHA_REGISTRO", "FECHA_TRABAJO", "TECNICO", "TAREA", "SEMANA", "MES", "AÑO"]);
+      sheet.setFrozenRows(1);
+    }
+    
+    const timestamp = new Date();
+    const fechaTrabajo = new Date(); // Por defecto hoy, o recibir de datos.date
+    const semana = Utilities.formatDate(fechaTrabajo, "GMT-3", "w");
+    const mes = Utilities.formatDate(fechaTrabajo, "GMT-3", "MMMM");
+    const anio = Utilities.formatDate(fechaTrabajo, "GMT-3", "yyyy");
+    
+    const filas = [];
+    
+    // Procesar cada tarea del lote
+    datos.tasks.forEach(tarea => {
+        const idUnico = "LOG-" + Math.floor(Math.random() * 1000000);
+        filas.push([
+            idUnico,
+            timestamp,
+            fechaTrabajo,
+            datos.worker,
+            tarea,
+            semana,
+            mes,
+            anio
+        ]);
+    });
+    
+    if (filas.length > 0) {
+        // Escribir en bloque
+        sheet.getRange(sheet.getLastRow() + 1, 1, filas.length, 8).setValues(filas);
+    }
+    
+    return respuestaJSON({ status: "success", message: "Bitácora actualizada", count: filas.length });
+    
+  } catch (e) {
+    return respuestaJSON({ status: "error", message: "Error al guardar en hoja externa: " + e.toString() });
+  }
 }

@@ -7,6 +7,8 @@ const ASSETS = [
     './products.js',
     './registro_herramientas.html', /* Standalone Tools Log */
     './registro_herramientas.js',
+    './bitacora_mantencion.html',
+    './bitacora_mantencion.js',
     './Cermaq_logo2.png',
     './Q.png',
     './manifest.json',
