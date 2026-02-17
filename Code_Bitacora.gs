@@ -11,6 +11,11 @@ const SHEET_NAME = "MANTENCIÓN";
 
 function doPost(e) {
   try {
+    // Safety check: ensure postData exists
+    if (!e || !e.postData || !e.postData.contents) {
+      return jsonResponse({ status: "error", message: "No se recibieron datos (postData is empty)" });
+    }
+
     const params = JSON.parse(e.postData.contents);
     const action = params.action;
 
@@ -21,7 +26,7 @@ function doPost(e) {
     }
 
   } catch (error) {
-    return jsonResponse({ status: "error", message: error.toString() });
+    return jsonResponse({ status: "error", message: "Error Interno: " + error.toString() });
   }
 }
 

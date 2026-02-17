@@ -3,8 +3,7 @@
  */
 const CONFIG = {
     // URL INDEPENDIENTE para la Bitácora de Mantención
-    // Debes pegar aquí la URL de tu NUEVO script un vez publicado
-    API_URL: 'PEGAR_AQUI_LA_NUEVA_URL_DEL_SCRIPT_DE_BITACORA',
+    API_URL: 'https://script.google.com/macros/s/AKfycbwCEKZ1qD_Ux44QnP0xZOVQugPF_siLQ_BeL_tgZkvh8wAKZLH9O4N9Wc3xbdkeKFCBGA/exec',
 };
 
 // Initialize
@@ -171,6 +170,9 @@ async function submitMaintenanceLog() {
         worker: worker,
         tasks: taskBatch
     };
+
+    console.log("Enviando reporte:", payload); // Debug log
+
 
     try {
         const result = await sendTransaction(payload);
