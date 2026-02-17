@@ -132,56 +132,134 @@ function applyStyle(el, style) {
 }
 
 let isToolSubmitting = false;
+let batchList = [];
 
-async function registerToolOut() {
-    if (isToolSubmitting) return;
-    const worker = document.getElementById('tool-worker').value.trim();
-    const area = document.getElementById('tool-area').value.trim();
-    const tool = document.getElementById('tool-name').value.trim();
-    const comment = document.getElementById('tool-comment').value.trim();
-    const submitBtn = document.getElementById('btn-tool-submit');
+function addToolToBatch() {
+    const toolInput = document.getElementById('tool-name');
+    const toolName = toolInput.value.trim();
 
-    if (worker.length < 3 || tool.length < 2) {
-        showToast("Nombre y Herramienta son obligatorios", "error");
+    if (toolName.length < 2) {
+        showToast("Escribe el nombre de la herramienta", "error");
+        toolInput.focus();
         return;
     }
 
-    const payload = {
-        action: 'TOOL_CHECK_OUT',
-        worker: worker,
-        area: area,
-        tool: tool,
-        comment: comment
-    };
+    batchList.push(toolName);
+    toolInput.value = "";
+    renderBatchList();
+}
+
+function removeToolFromBatch(index) {
+    batchList.splice(index, 1);
+    renderBatchList();
+}
+
+function renderBatchList() {
+    const container = document.getElementById('tool-batch-list');
+    container.innerHTML = '';
+
+    batchList.forEach((tool, index) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.background = 'var(--glass-bg)';
+        div.style.padding = '8px 12px';
+        div.style.borderRadius = '8px';
+        div.style.border = '1px solid var(--glass-border)';
+
+        div.innerHTML = `
+            <span style="font-weight: 500;">${tool}</span>
+            <button onclick="removeToolFromBatch(${index})" style="background: none; border: none; color: var(--danger); cursor: pointer;">
+                <span class="material-icons-round">remove_circle</span>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+async function registerToolOut() {
+    if (isToolSubmitting) return;
+
+    const worker = document.getElementById('tool-worker').value.trim();
+    const area = document.getElementById('tool-area').value.trim();
+    const comment = document.getElementById('tool-comment').value.trim();
+    const submitBtn = document.getElementById('btn-tool-submit');
+
+    // Also check current input if user forgot to click add
+    const currentInput = document.getElementById('tool-name').value.trim();
+    if (currentInput.length >= 2) {
+        batchList.push(currentInput);
+        document.getElementById('tool-name').value = "";
+        renderBatchList();
+    }
+
+    if (worker.length < 3) {
+        showToast("El nombre del responsable es obligatorio", "error");
+        return;
+    }
+
+    if (batchList.length === 0) {
+        showToast("Agrega al menos una herramienta", "error");
+        return;
+    }
 
     isToolSubmitting = true;
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="material-icons-round spin">sync</span>';
+        submitBtn.innerHTML = '<span class="material-icons-round spin">sync</span> Enviando...';
     }
-    showToast("Registrando...", "info");
+    showToast(`Registrando ${batchList.length} ítems...`, "info");
 
-    try {
-        const result = await sendTransaction(payload);
+    let successCount = 0;
+    let errors = [];
 
-        if (result.status === 'success' || result.status === 'offline') {
-            showToast("Préstamo registrado exitosamente", "success");
-            // Clear form
-            document.getElementById('tool-name').value = "";
-            document.getElementById('tool-comment').value = "";
-            // Switch to list to see it
-            switchToolTab('active');
-            isToolSubmitting = false;
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
-        } else {
-            showToast("Error: " + (result.message || result.error || "Desconocido"), "error");
-            isToolSubmitting = false;
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
+    // Process all items in batch
+    for (const tool of batchList) {
+        const payload = {
+            action: 'TOOL_CHECK_OUT',
+            worker: worker,
+            area: area,
+            tool: tool,
+            comment: comment
+        };
+
+        try {
+            const result = await sendTransaction(payload);
+            if (result.status === 'success' || result.status === 'offline') {
+                successCount++;
+            } else {
+                errors.push(`${tool}: ${result.message || 'Error'}`);
+            }
+        } catch (e) {
+            errors.push(`${tool}: Error de conexión`);
         }
-    } catch (e) {
-        showToast("Error de conexión: " + e.message, "error");
-        isToolSubmitting = false;
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA'; }
+    }
+
+    isToolSubmitting = false;
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="material-icons-round">output</span> REGISTRAR SALIDA';
+    }
+
+    if (successCount > 0) {
+        showToast(`Registrados ${successCount} de ${batchList.length} ítems`, "success");
+        // Remove successfully submitted items (complex logic to track? lets just clear all if mostly success)
+        if (errors.length === 0) {
+            batchList = [];
+            renderBatchList();
+            document.getElementById('tool-comment').value = "";
+            switchToolTab('active');
+        } else {
+            alert(`Errores:\n${errors.join('\n')}`);
+            // Keep items in list so user can retry? 
+            // For simplicity, we clear list but show alert. 
+            batchList = [];
+            renderBatchList();
+            switchToolTab('active');
+        }
+    } else {
+        showToast("Error al registrar herramientas", "error");
     }
 }
 

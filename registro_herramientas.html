@@ -92,7 +92,17 @@
             <div class="card" style="margin-bottom: 1rem;">
                 <div class="input-group">
                     <label class="input-label">Herramienta / Insumo</label>
-                    <input type="text" id="tool-name" class="input-field" placeholder="Ej. Pistola de Impacto DeWALT">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="tool-name" class="input-field"
+                            placeholder="Ej. Pistola de Impacto DeWALT" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="addToolToBatch()"
+                            style="width: 50px; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--primary); color: white; border: none;">
+                            <span class="material-icons-round">add</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Batch List Container -->
+                <div id="tool-batch-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
                 </div>
             </div>
 
