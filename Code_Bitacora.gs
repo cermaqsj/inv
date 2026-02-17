@@ -21,6 +21,8 @@ function doPost(e) {
 
     if (action === "MAINTENANCE_LOG") {
       return saveMaintenanceLog(params);
+    } else if (action === "GET_LOGS") {
+        return getLogs(params);
     } else {
       return jsonResponse({ status: "error", message: "Acción desconocida" });
     }
@@ -81,6 +83,37 @@ function saveMaintenanceLog(data) {
   } catch (e) {
     return jsonResponse({ status: "error", message: "Error al guardar: " + e.toString() });
   }
+}
+
+function getLogs(params) {
+    try {
+        const ss = SpreadsheetApp.openById(SHEET_ID);
+        let sheet = ss.getSheetByName(SHEET_NAME);
+        if (!sheet) sheet = ss.getSheets()[0];
+
+        const lastRow = sheet.getLastRow();
+        if (lastRow < 2) return jsonResponse({ status: "success", logs: [] }); // Empty sheet
+
+        // Read last 100 rows for performance
+        const startRow = Math.max(2, lastRow - 99);
+        const numRows = lastRow - startRow + 1;
+        const data = sheet.getRange(startRow, 1, numRows, 8).getValues(); // Read columns A-H
+
+        // Map array to object
+        // Columns: 0:ID, 1:Timestamp, 2:WorkDate, 3:Worker, 4:Task, 5:Week, 6:Month, 7:Year
+        const logs = data.map(row => ({
+            id: row[0],
+            date: row[2], // Use WorkDate for display
+            worker: row[3],
+            task: row[4],
+            month: row[6]
+        })).reverse(); // Newest first
+
+        return jsonResponse({ status: "success", logs: logs });
+
+    } catch (e) {
+        return jsonResponse({ status: "error", message: "Error al leer logs: " + e.toString() });
+    }
 }
 
 // Utilitario para responder JSON

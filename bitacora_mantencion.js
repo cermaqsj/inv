@@ -3,7 +3,7 @@
  */
 const CONFIG = {
     // URL INDEPENDIENTE para la Bitácora de Mantención
-    API_URL: 'https://script.google.com/macros/s/AKfycbwCEKZ1qD_Ux44QnP0xZOVQugPF_siLQ_BeL_tgZkvh8wAKZLH9O4N9Wc3xbdkeKFCBGA/exec',
+    API_URL: 'https://script.google.com/macros/s/AKfycbzhvJyblr2Ci91B-gXW1xebSfypMCPLwAzA_4iXlBrkA9ERPHbFfrjAZz5XIEikirl30A/exec',
 };
 
 // Initialize
@@ -186,6 +186,7 @@ async function submitMaintenanceLog() {
         }
     } catch (e) {
         showToast("Error de conexión", "error");
+        // ... existing code ...
     } finally {
         isSubmitting = false;
         if (submitBtn) {
@@ -193,4 +194,146 @@ async function submitMaintenanceLog() {
             submitBtn.innerHTML = '<span class="material-icons-round">send</span> ENVIAR REPORTE';
         }
     }
+}
+
+/**
+ * HISTORY & EXPORT LOGIC
+ */
+
+function openSheet() {
+    // ID from conversation: 1KFCkva7EhMKEajaGaigPIeNWt4vJVs_1KbJxwErDe44
+    window.open('https://docs.google.com/spreadsheets/d/1KFCkva7EhMKEajaGaigPIeNWt4vJVs_1KbJxwErDe44/edit?usp=sharing', '_blank');
+}
+
+function openHistoryModal() {
+    document.getElementById('modal-history').style.display = 'flex';
+    loadHistory();
+}
+
+function closeHistoryModal() {
+    document.getElementById('modal-history').style.display = 'none';
+}
+
+async function loadHistory() {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light);">Cargando...</div>';
+
+    try {
+        const result = await sendTransaction({ action: 'GET_LOGS' });
+
+        if (result.status === 'success') {
+            renderHistory(result.logs);
+        } else {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">Error: ${result.message}</div>`;
+        }
+    } catch (e) {
+        list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">Error de conexión</div>`;
+    }
+}
+
+function renderHistory(logs) {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '';
+
+    if (!logs || logs.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light);">No hay registros recientes.</div>';
+        return;
+    }
+
+    logs.forEach(log => {
+        // Parse date nicely
+        let dateStr = log.date;
+        try {
+            const d = new Date(log.date);
+            if (!isNaN(d.getTime())) {
+                dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        } catch (e) { }
+
+        const card = document.createElement('div');
+        card.style.background = 'var(--glass-bg)';
+        card.style.border = '1px solid var(--glass-border)';
+        card.style.borderRadius = '12px';
+        card.style.padding = '12px';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '5px';
+
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-light);">
+                <span>${dateStr}</span>
+                <span style="font-weight:bold; color:var(--primary);">${log.worker}</span>
+            </div>
+            <div style="font-size:1rem; font-weight:500;">
+                ${log.task}
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-light); text-align:right;">
+                ID: ${log.id}
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+async function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    if (!jsPDF) {
+        showToast("Librería PDF no cargada", "error");
+        return;
+    }
+
+    const doc = new jsPDF();
+    const logs = document.querySelectorAll('#history-list > div'); // Grab rendered cards
+
+    if (logs.length === 0) {
+        showToast("No hay datos para exportar", "warning");
+        return;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Reporte Bitácora Mantención", 105, 15, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generado: ${new Date().toLocaleString()}`, 105, 22, { align: "center" });
+
+    let y = 35;
+
+    // Simple iteration over rendered DOM elements to get content
+    // In a real app we might use the raw data 'lastLogs' if we stored it globally
+    // But DOM parsing is wysiwyg-ish here
+
+    Array.from(logs).forEach((card, index) => {
+        if (y > 270) {
+            doc.addPage();
+            y = 20;
+        }
+
+        const dateWorker = card.children[0].innerText.split('\n').join(' - '); // "Date - Worker"
+        const task = card.children[1].innerText.trim();
+        const id = card.children[2].innerText.trim();
+
+        // Draw box
+        doc.setDrawColor(200);
+        doc.setFillColor(245, 247, 250);
+        doc.rect(10, y - 5, 190, 20, 'F');
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text(dateWorker, 12, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(task, 12, y + 6);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(id, 195, y, { align: "right" });
+        doc.setTextColor(0);
+
+        y += 25;
+    });
+
+    doc.save("bitacora_mantencion.pdf");
+    showToast("PDF Descargado", "success");
 }
