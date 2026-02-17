@@ -2,9 +2,9 @@
  * CONFIGURATION
  */
 const CONFIG = {
-    // Shared API URL (Same as other modules)
-    DEFAULT_API: 'https://script.google.com/macros/s/AKfycbw-uXGY9Thidg9nT5DYinYhQUt64NMZw9AvIBsV6pAYtT8dc-wW4rR9wTPUUB10EtmRXQ/exec',
-    STORAGE_KEY: 'cermaq_inventory_url_v2',
+    // URL INDEPENDIENTE para la Bitácora de Mantención
+    // Debes pegar aquí la URL de tu NUEVO script un vez publicado
+    API_URL: 'PEGAR_AQUI_LA_NUEVA_URL_DEL_SCRIPT_DE_BITACORA',
 };
 
 // Initialize
@@ -20,12 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
  * API HANDLING
  */
 function getApiUrl() {
-    return localStorage.getItem(CONFIG.STORAGE_KEY) || CONFIG.DEFAULT_API;
+    // Usamos la URL específica de este módulo
+    // Si no está configurada, avisamos
+    if (!CONFIG.API_URL || CONFIG.API_URL.includes('PEGAR_AQUI')) {
+        alert("Falta configurar la URL del Script de Bitácora en bitacora_mantencion.js");
+        return '';
+    }
+    return CONFIG.API_URL;
 }
 
 async function sendTransaction(payload) {
+    const url = getApiUrl();
+    if (!url) return { status: "error", message: "URL no configurada" };
+
     try {
-        const response = await fetch(getApiUrl(), {
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(payload)
         });
