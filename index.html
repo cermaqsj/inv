@@ -288,20 +288,7 @@
             text-align: center;
         }
 
-        /* Action buttons pinned to top right ALWAYS horizontal */
-        .bodega-hero-actions {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            /* Center them vertically in the thinner header */
-            right: 14px;
-            z-index: 3;
-            display: flex;
-            flex-direction: row !important;
-            /* Forces horizontal forever */
-            flex-wrap: nowrap !important;
-            gap: 8px;
-        }
+        /* Action buttons moved below header, keeping style for reference if needed elsewhere */
 
         /* Sleek frosty dark buttons */
         .bodega-icon-btn {
@@ -335,20 +322,50 @@
             font-size: 18px;
             color: inherit !important;
         }
+
+        /* Status Bar (Pill + Actions) */
+        .status-bar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 4px;
+            /* Align with grid */
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Buttons that match the theme */
+        .theme-action-btn {
+            height: 36px;
+            width: 36px;
+            padding: 0;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+        }
+
+        .theme-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
     </style>
 
     <header class="bodega-hero">
         <div class="bodega-hero-beam"></div>
-
-        <div class="bodega-hero-actions">
-            <!-- Theme toggle now clearly visible regardless of background -->
-            <button class="bodega-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema">
-                <span class="material-icons-round">dark_mode</span>
-            </button>
-            <button class="bodega-icon-btn" id="btn-admin-login" onclick="toggleAdmin()" title="Acceso Admin">
-                <span class="material-icons-round">admin_panel_settings</span>
-            </button>
-        </div>
 
         <div class="bodega-hero-body">
             <img src="Cermaq_logo2.png" alt="Cermaq" class="bodega-hero-logo">
@@ -369,12 +386,21 @@
     <main>
         <!-- VIEW: HOME (The Grid) -->
         <div id="view-home">
-            <!-- Status Indicator -->
-            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 2rem;">
+            <!-- Status Indicator & Actions Horizontal Bar -->
+            <div class="status-bar-container">
                 <div class="status-pill"
                     style="margin: 0; display: inline-flex; align-items: center; justify-content: center; padding: 6px 16px; border-radius: 20px;">
                     <span id="status-dot" class="dot"></span>
                     <span id="status-text" style="font-weight: 500;">Iniciando Sistema...</span>
+                </div>
+
+                <div class="status-actions">
+                    <button class="theme-action-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema">
+                        <span class="material-icons-round" style="font-size: 20px;">dark_mode</span>
+                    </button>
+                    <button class="theme-action-btn" id="btn-admin-login" onclick="toggleAdmin()" title="Acceso Admin">
+                        <span class="material-icons-round" style="font-size: 20px;">admin_panel_settings</span>
+                    </button>
                 </div>
             </div>
 
