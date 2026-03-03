@@ -3,7 +3,7 @@
  */
 const CONFIG = {
     // URL INDEPENDIENTE para la Bitácora de Mantención
-    API_URL: 'https://script.google.com/macros/s/AKfycbzhvJyblr2Ci91B-gXW1xebSfypMCPLwAzA_4iXlBrkA9ERPHbFfrjAZz5XIEikirl30A/exec',
+    API_URL: 'https://script.google.com/macros/s/AKfycbwsb1pbVnVxqwGQCGeUaOHjq9gmGFk7f6qzNgK4SbcVVuKxcMBuCIpOcAZitEEXlRZN/exec',
 };
 
 // Initialize
@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedWorker = localStorage.getItem('maint_worker_name');
     if (savedWorker) {
         document.getElementById('maint-worker').value = savedWorker;
+    }
+
+    // Set today's date as default for FECHA_TRABAJO
+    const fechaInput = document.getElementById('maint-fecha');
+    if (fechaInput) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        fechaInput.value = `${yyyy}-${mm}-${dd}`;
     }
 });
 
@@ -134,6 +144,8 @@ async function submitMaintenanceLog() {
 
     const workerInput = document.getElementById('maint-worker');
     const worker = workerInput.value.trim();
+    const fechaInput = document.getElementById('maint-fecha');
+    const fecha = fechaInput ? fechaInput.value : '';
     const submitBtn = document.getElementById('btn-maint-submit');
 
     // Auto-add current input if not empty
@@ -147,6 +159,12 @@ async function submitMaintenanceLog() {
     if (worker.length < 3) {
         showToast("Ingresa tu nombre completo", "error");
         workerInput.focus();
+        return;
+    }
+
+    if (!fecha) {
+        showToast("Selecciona la fecha de trabajo", "error");
+        if (fechaInput) fechaInput.focus();
         return;
     }
 
@@ -164,10 +182,11 @@ async function submitMaintenanceLog() {
         submitBtn.innerHTML = '<span class="material-icons-round spin">sync</span> Enviando...';
     }
 
-    // Payload
+    // Payload — fecha_trabajo se escribira en columna C (FECHA_TRABAJO)
     const payload = {
         action: 'MAINTENANCE_LOG',
         worker: worker,
+        fecha_trabajo: fecha,
         tasks: taskBatch
     };
 

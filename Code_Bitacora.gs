@@ -33,8 +33,8 @@ function doPost(e) {
 }
 
 function saveMaintenanceLog(data) {
-  // data = { worker: "Nombre", tasks: ["Tarea 1", "Tarea 2"] }
-  
+  // data = { worker: "Nombre", fecha_trabajo: "YYYY-MM-DD", tasks: ["Tarea 1", "Tarea 2"] }
+
   try {
     // Abrir la hoja de cálculo por ID
     const ss = SpreadsheetApp.openById(SHEET_ID);
@@ -45,36 +45,44 @@ function saveMaintenanceLog(data) {
       sheet = ss.getSheets()[0];
     }
 
-    const timestamp = new Date();
-    const workDate = new Date(); // Fecha del trabajo (hoy)
-    
-    // Variables de tiempo locales (Chile GMT-3 o config de la hoja)
-    // Usamos Utilities.formatDate para asegurar consistencia
-    const week = Utilities.formatDate(workDate, ss.getSpreadsheetTimeZone(), "w");
-    const month = Utilities.formatDate(workDate, ss.getSpreadsheetTimeZone(), "MMMM");
-    const year = Utilities.formatDate(workDate, ss.getSpreadsheetTimeZone(), "yyyy");
+    const timestamp = new Date(); // B: Momento exacto del registro
+
+    // C: FECHA_TRABAJO — usa la fecha enviada por el usuario, o hoy como respaldo
+    let workDate;
+    if (data.fecha_trabajo) {
+      // El frontend envía "YYYY-MM-DD"; parseamos como fecha local
+      const parts = data.fecha_trabajo.split('-');
+      workDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    } else {
+      workDate = new Date(); // Respaldo: fecha de hoy
+    }
+
+    // Derivar semana, mes y año desde la fecha de trabajo seleccionada
+    const tz = ss.getSpreadsheetTimeZone();
+    const week  = Utilities.formatDate(workDate, tz, "w");
+    const month = Utilities.formatDate(workDate, tz, "MMMM");
+    const year  = Utilities.formatDate(workDate, tz, "yyyy");
 
     const newRows = [];
 
     // Por cada tarea en la lista, creamos una fila
-    data.tasks.forEach(task => {
+    data.tasks.forEach(function(task) {
       const uniqueId = "LOG-" + Math.floor(Math.random() * 1000000).toString();
-      
+
       newRows.push([
-        uniqueId,           // A: ID
-        timestamp,          // B: FECHA_REGISTRO
-        workDate,           // C: FECHA_TRABAJO
-        data.worker,        // D: TECNICO
-        task,               // E: TAREA
-        week,               // F: SEMANA
-        month,              // G: MES
-        year                // H: AÑO
+        uniqueId,      // A: ID
+        timestamp,     // B: FECHA_REGISTRO (momento del envío)
+        workDate,      // C: FECHA_TRABAJO  (fecha elegida por el usuario)
+        data.worker,   // D: TECNICO
+        task,          // E: TAREA
+        week,          // F: SEMANA
+        month,         // G: MES
+        year           // H: AÑO
       ]);
     });
 
     // Guardar en bloque (más rápido)
     if (newRows.length > 0) {
-      // getRange(fila, columna, numFilas, numColumnas)
       sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, 8).setValues(newRows);
     }
 
