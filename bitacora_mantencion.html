@@ -6,166 +6,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bitácora Mantención - Cermaq</title>
 
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
-    <!-- Local Styles -->
     <link rel="stylesheet" href="cermaq-style.css?v=11.1-ULTRA">
 
-    <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="Q.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="bitacora_mantencion.js?v=1.2" defer></script>
+    <script src="bitacora_mantencion.js?v=1.3" defer></script>
 
     <style>
         /* =============================================
-           BITÁCORA — PREMIUM MINIMAL OVERRIDE v2
+           BITÁCORA — HERO BANNER v3  (clean rewrite)
         ============================================= */
 
-        /* ---------- LOCAL PALETTE (sober & refined) ---------- */
-        :root {
-            --bit-nav-bg: rgba(10, 12, 18, 0.96);
-            --bit-border: rgba(255, 255, 255, 0.07);
-            --bit-accent: #e2e8f0;
-            /* pearl white */
-            --bit-accent-dim: rgba(226, 232, 240, 0.5);
-            --bit-pill-bg: rgba(255, 255, 255, 0.055);
-            --bit-pill-hover: rgba(255, 255, 255, 0.10);
-            --bit-step-ring: #475569;
-            /* slate-600 */
-            --bit-step-active: #e2e8f0;
-            --bit-input-bg: rgba(255, 255, 255, 0.04);
-            --bit-input-border: rgba(255, 255, 255, 0.1);
-            --bit-btn-primary: #e2e8f0;
-            --bit-btn-primary-text: #0a0c12;
-        }
-
-        [data-theme="light"] {
-            --bit-nav-bg: rgba(255, 255, 255, 0.92);
-            --bit-border: rgba(0, 0, 0, 0.07);
-            --bit-accent: #0f172a;
-            --bit-accent-dim: rgba(15, 23, 42, 0.4);
-            --bit-pill-bg: rgba(0, 0, 0, 0.04);
-            --bit-pill-hover: rgba(0, 0, 0, 0.08);
-            --bit-step-ring: #94a3b8;
-            --bit-step-active: #0f172a;
-            --bit-input-bg: #ffffff;
-            --bit-input-border: #e2e8f0;
-            --bit-btn-primary: #0f172a;
-            --bit-btn-primary-text: #ffffff;
-        }
-
-        /* ---------- NAV ---------- */
-        .bit-nav {
+        /* ---- HERO: always dark regardless of page theme ---- */
+        .bit-hero {
+            position: relative;
+            width: 100%;
+            background: #000;
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.4rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: var(--bit-nav-bg);
-            backdrop-filter: blur(28px) saturate(180%);
-            -webkit-backdrop-filter: blur(28px) saturate(180%);
-            border-bottom: 1px solid var(--bit-border);
-            box-shadow: 0 1px 0 var(--bit-border), 0 4px 24px rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            padding: 2.6rem 1.4rem 2.2rem;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.8);
         }
 
-        /* Brand */
-        .bit-nav-brand {
+        /* Particles canvas scoped to the banner */
+        #hero-particles {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Light beam behind the logo */
+        .bit-hero-beam {
+            position: absolute;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 360px;
+            height: 280px;
+            background: radial-gradient(ellipse at 50% 0%,
+                    rgba(255, 255, 255, 0.14) 0%,
+                    rgba(255, 255, 255, 0.04) 45%,
+                    transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Content centred above canvas */
+        .bit-hero-body {
+            position: relative;
+            z-index: 2;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 13px;
         }
 
-        .bit-nav-logo {
-            height: 36px;
+        /* White glowing logo */
+        .bit-hero-logo {
+            height: 46px;
             width: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(255, 255, 255, 0.18));
-            transition: filter 0.3s;
+            filter: brightness(0) invert(1) drop-shadow(0 0 18px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+            animation: logo-glow 4s ease-in-out infinite;
         }
 
-        [data-theme="light"] .bit-nav-logo {
-            filter: none drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+        @keyframes logo-glow {
+
+            0%,
+            100% {
+                filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(255, 255, 255, 0.28)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            }
+
+            50% {
+                filter: brightness(0) invert(1) drop-shadow(0 0 28px rgba(255, 255, 255, 0.60)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.90));
+            }
         }
 
-        .bit-nav-divider {
-            width: 1px;
-            height: 22px;
-            background: var(--bit-border);
+        /* Thin hairline rule */
+        .bit-hero-rule {
+            width: 28px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.18);
             border-radius: 1px;
         }
 
-        .bit-nav-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-
-        .bit-nav-title {
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            color: var(--bit-accent);
-            line-height: 1;
-        }
-
-        .bit-nav-sub {
-            font-size: 0.62rem;
-            letter-spacing: 0.12em;
+        /* Subtitle */
+        .bit-hero-title {
+            font-size: 0.82rem;
+            font-weight: 300;
+            letter-spacing: 0.24em;
             text-transform: uppercase;
-            color: var(--bit-accent-dim);
-            line-height: 1;
+            color: #fff;
+            opacity: 0.80;
+            margin: 0;
+            text-align: center;
         }
 
-        /* Action pills */
-        .bit-nav-actions {
+        /* Action buttons — fixed white contrast regardless of theme  */
+        .bit-hero-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 3;
             display: flex;
             gap: 6px;
-            align-items: center;
         }
 
         .bit-icon-btn {
-            height: 34px;
-            padding: 0 12px;
+            height: 32px;
+            padding: 0 11px;
             border-radius: 8px;
-            border: 1px solid var(--bit-border);
-            background: var(--bit-pill-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--bit-accent-dim);
-            font-size: 0.7rem;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            /* colour hardcoded white — never inherits page theme */
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-size: 0.68rem;
             font-weight: 600;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
             white-space: nowrap;
+            font-family: inherit;
         }
 
         .bit-icon-btn:hover {
-            background: var(--bit-pill-hover);
-            color: var(--bit-accent);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        [data-theme="light"] .bit-icon-btn:hover {
-            border-color: rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.17);
+            color: #fff !important;
+            border-color: rgba(255, 255, 255, 0.38);
         }
 
         .bit-icon-btn .material-icons-round {
             font-size: 16px;
+            color: inherit !important;
         }
 
-        /* hide labels on very small screens */
         .bit-btn-label {
             display: none;
         }
@@ -176,7 +171,7 @@
             }
         }
 
-        /* ---------- MAIN LAYOUT ---------- */
+        /* ---- PAGE BODY ---- */
         .bit-main {
             max-width: 480px;
             margin: 0 auto;
@@ -186,7 +181,7 @@
             gap: 0;
         }
 
-        /* ---------- PAGE TITLE ---------- */
+        /* Page subtitle */
         .bit-page-title {
             text-align: center;
             margin-bottom: 2rem;
@@ -206,7 +201,7 @@
             margin: 0;
         }
 
-        /* ---------- STEP BLOCK ---------- */
+        /* ---- STEP ---- */
         .bit-step {
             display: flex;
             gap: 14px;
@@ -244,7 +239,7 @@
             display: block;
         }
 
-        /* ---------- INPUTS ---------- */
+        /* ---- INPUTS ---- */
         .bit-input {
             width: 100%;
             padding: 0.85rem 1rem;
@@ -277,7 +272,6 @@
             font-weight: 400;
         }
 
-        /* date input fix */
         input[type="date"].bit-input {
             color-scheme: dark;
         }
@@ -293,7 +287,7 @@
             display: block;
         }
 
-        /* ---------- TASK ROW ---------- */
+        /* ---- TASK ROW ---- */
         .bit-task-row {
             display: flex;
             gap: 8px;
@@ -328,7 +322,7 @@
             transform: scale(0.97);
         }
 
-        /* ---------- BATCH LIST ---------- */
+        /* ---- BATCH ---- */
         #maint-batch-list {
             margin-top: 10px;
             display: flex;
@@ -376,14 +370,14 @@
             font-size: 18px;
         }
 
-        /* ---------- DIVIDER ---------- */
+        /* ---- DIVIDER ---- */
         .bit-divider {
             height: 1px;
             background: var(--glass-border);
             margin: 0.8rem 0 1.6rem 42px;
         }
 
-        /* ---------- ACTION BUTTONS ---------- */
+        /* ---- ACTIONS ---- */
         .bit-actions {
             margin-top: 0.4rem;
             display: flex;
@@ -443,6 +437,7 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.2s ease;
+            font-family: inherit;
         }
 
         .bit-btn-ghost:hover {
@@ -451,12 +446,12 @@
             border-color: var(--btn-hover-border);
         }
 
-        /* ---------- MODAL ---------- */
+        /* ---- MODAL ---- */
         #modal-history {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.52);
             backdrop-filter: blur(6px);
             z-index: 1000;
             justify-content: center;
@@ -536,6 +531,7 @@
             justify-content: center;
             gap: 6px;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
         .bit-modal-toolbar .btn-pdf {
@@ -566,7 +562,6 @@
             gap: 8px;
         }
 
-        /* Spin animation (used by submit btn) */
         @keyframes spin {
             from {
                 transform: rotate(0deg);
@@ -585,21 +580,20 @@
 </head>
 
 <body>
-    <!-- Background Particles -->
+    <!-- Page-level bg particles (light/dark aware) -->
     <canvas id="bg-particles"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6;"></canvas>
+        style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.5;"></canvas>
 
-    <!-- ===== NAV ===== -->
-    <nav class="bit-nav" style="border-radius:0;">
-        <div class="bit-nav-brand">
-            <img src="Cermaq_logo2.png" alt="Cermaq" class="bit-nav-logo">
-            <div class="bit-nav-divider"></div>
-            <div class="bit-nav-meta">
-                <span class="bit-nav-title">Bitácora</span>
-                <span class="bit-nav-sub">Mantención</span>
-            </div>
-        </div>
-        <div class="bit-nav-actions">
+    <!-- ===== HERO BANNER (always black) ===== -->
+    <header class="bit-hero">
+        <!-- Banner particles -->
+        <canvas id="hero-particles"></canvas>
+
+        <!-- Light beam -->
+        <div class="bit-hero-beam"></div>
+
+        <!-- Action buttons — white contrast always -->
+        <div class="bit-hero-actions">
             <button class="bit-icon-btn" onclick="openSheet()" title="Abrir Planilla">
                 <span class="material-icons-round">table_view</span>
                 <span class="bit-btn-label">Planilla</span>
@@ -612,7 +606,14 @@
                 <span class="bit-btn-label">Volver</span>
             </button>
         </div>
-    </nav>
+
+        <!-- Logo + title -->
+        <div class="bit-hero-body">
+            <img src="Cermaq_logo2.png" alt="Cermaq" class="bit-hero-logo">
+            <div class="bit-hero-rule"></div>
+            <p class="bit-hero-title">Bitácora Mantención</p>
+        </div>
+    </header>
 
     <!-- Theme Init -->
     <script>
@@ -627,13 +628,12 @@
     <!-- ===== MAIN ===== -->
     <main class="bit-main" style="padding-bottom: 80px;">
 
-        <!-- Title -->
         <div class="bit-page-title">
             <h1>Registro de Actividades</h1>
             <p>Completa los campos y envía tu reporte diario</p>
         </div>
 
-        <!-- Step 1: Técnico -->
+        <!-- Step 1 -->
         <div class="bit-step">
             <div class="bit-step-num">1</div>
             <div class="bit-step-body">
@@ -644,7 +644,7 @@
 
         <div class="bit-divider"></div>
 
-        <!-- Step 2: Fecha -->
+        <!-- Step 2 -->
         <div class="bit-step">
             <div class="bit-step-num">2</div>
             <div class="bit-step-body">
@@ -657,7 +657,7 @@
 
         <div class="bit-divider"></div>
 
-        <!-- Step 3: Tareas -->
+        <!-- Step 3 -->
         <div class="bit-step">
             <div class="bit-step-num">3</div>
             <div class="bit-step-body">
@@ -668,7 +668,6 @@
                         <span class="material-icons-round">add</span>
                     </button>
                 </div>
-                <!-- Batch List Container -->
                 <div id="maint-batch-list"></div>
             </div>
         </div>
@@ -689,14 +688,12 @@
     <div id="modal-history">
         <div class="bit-modal-sheet">
             <div class="bit-modal-handle"></div>
-
             <div class="bit-modal-header">
                 <h2>Historial Reciente</h2>
                 <button class="bit-modal-close" onclick="closeHistoryModal()">
                     <span class="material-icons-round">close</span>
                 </button>
             </div>
-
             <div class="bit-modal-toolbar">
                 <button class="btn-pdf" onclick="exportPDF()">
                     <span class="material-icons-round">picture_as_pdf</span> PDF
@@ -705,9 +702,8 @@
                     <span class="material-icons-round">refresh</span> Actualizar
                 </button>
             </div>
-
             <div id="history-list">
-                <div style="text-align:center; padding:20px; color:var(--text-muted);">Cargando historial...</div>
+                <div style="text-align:center;padding:20px;color:var(--text-muted);">Cargando historial...</div>
             </div>
         </div>
     </div>
@@ -715,51 +711,90 @@
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Particles Script -->
     <script>
+        // ---- Banner particles (always white dots on black) ----
+        (function () {
+            const canvas = document.getElementById('hero-particles');
+            const ctx = canvas.getContext('2d');
+            let pts = [];
+
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const N = 38;
+            for (let i = 0; i < N; i++) {
+                pts.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.28,
+                    vy: (Math.random() - 0.5) * 0.28,
+                    r: Math.random() * 1.5 + 0.5
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255,255,255,0.35)';
+                for (const p of pts) {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ---- Page bg particles (theme-aware) ----
         (function () {
             const canvas = document.getElementById('bg-particles');
             const ctx = canvas.getContext('2d', { alpha: true });
-            let particles = [];
+            let pts = [];
+
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
-            window.addEventListener('resize', resize);
             resize();
-            const particleCount = window.innerWidth < 768 ? 20 : 40;
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.3;
-                    this.vy = (Math.random() - 0.5) * 0.3;
-                    this.size = Math.random() * 2 + 1;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    if (this.x < 0) this.x = canvas.width;
-                    if (this.x > canvas.width) this.x = 0;
-                    if (this.y < 0) this.y = canvas.height;
-                    if (this.y > canvas.height) this.y = 0;
-                }
+            window.addEventListener('resize', resize);
+
+            const N = window.innerWidth < 768 ? 18 : 35;
+            for (let i = 0; i < N; i++) {
+                pts.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.25,
+                    vy: (Math.random() - 0.5) * 0.25,
+                    r: Math.random() * 1.8 + 0.6
+                });
             }
-            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-            function animate() {
+
+            function draw() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const theme = document.documentElement.getAttribute('data-theme');
-                ctx.fillStyle = theme === 'light' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(255, 255, 255, 0.3)';
-                for (let i = 0; i < particles.length; i++) {
-                    let p = particles[i];
-                    p.update();
+                const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+                ctx.fillStyle = dark ? 'rgba(255,255,255,0.28)' : 'rgba(15,23,42,0.18)';
+                for (const p of pts) {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                requestAnimationFrame(animate);
+                requestAnimationFrame(draw);
             }
-            animate();
+            draw();
         })();
     </script>
 </body>
