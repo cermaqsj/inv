@@ -121,23 +121,18 @@ function renderTaskBatch() {
 
     taskBatch.forEach((task, index) => {
         const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.justifyContent = 'space-between';
-        div.style.alignItems = 'center';
-        div.style.background = 'var(--glass-bg)';
-        div.style.padding = '10px 14px';
-        div.style.borderRadius = '8px';
-        div.style.border = '1px solid var(--glass-border)';
+        div.className = 'batch-item';
 
         div.innerHTML = `
-            <span style="font-weight: 500; font-size: 0.95rem;">${task}</span>
-            <button onclick="removeTaskFromBatch(${index})" style="background: none; border: none; color: var(--danger); cursor: pointer;">
-                <span class="material-icons-round">remove_circle</span>
+            <span>${task}</span>
+            <button class="batch-remove-btn" onclick="removeTaskFromBatch(${index})" title="Eliminar">
+                <span class="material-icons-round">remove_circle_outline</span>
             </button>
         `;
         container.appendChild(div);
     });
 }
+
 
 async function submitMaintenanceLog() {
     if (isSubmitting) return;
