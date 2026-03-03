@@ -214,12 +214,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2.8rem 1.4rem 2.2rem;
-            /* good breathing room */
+            padding: 1.2rem 1rem 1.2rem;
+            /* Significantly reduced vertical padding for a thinner look */
             box-sizing: border-box;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             /* crisp edge */
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             z-index: 50;
         }
 
@@ -246,10 +246,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            /* Slightly tighter */
-            margin-top: 24px;
-            /* Push down so top-right buttons don't overlap on very small screens */
+            gap: 6px;
+            /* Tighter gap between logo and title */
+            margin-top: 2px;
+            /* Remove the huge push-down */
         }
 
         /* Pure white logo with subtle glow to prevent pixelation */
@@ -276,9 +276,10 @@
         }
 
         .bodega-hero-title {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
+            /* Slightly smaller to fit slim profile */
             font-weight: 300;
-            letter-spacing: 0.28em;
+            letter-spacing: 0.25em;
             /* Extremely wide elegant tracking */
             text-transform: uppercase;
             color: #fff;
@@ -290,7 +291,9 @@
         /* Action buttons pinned to top right ALWAYS horizontal */
         .bodega-hero-actions {
             position: absolute;
-            top: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            /* Center them vertically in the thinner header */
             right: 14px;
             z-index: 3;
             display: flex;
