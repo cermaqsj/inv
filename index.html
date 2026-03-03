@@ -246,29 +246,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            /* Space between logo and text */
+            gap: 12px;
+            /* Slightly tighter */
+            margin-top: 24px;
+            /* Push down so top-right buttons don't overlap on very small screens */
         }
 
-        /* Pure white logo with Cermaq Cyan glow */
+        /* Pure white logo with subtle glow to prevent pixelation */
         .bodega-hero-logo {
-            height: 48px;
+            height: 38px;
+            /* Was 48px, smaller is crisper */
             width: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(0, 169, 224, 0.4)) drop-shadow(0 0 8px rgba(0, 169, 224, 0.6));
+            filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
             animation: bodega-logo-glow 4s ease-in-out infinite;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         @keyframes bodega-logo-glow {
 
             0%,
             100% {
-                filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(0, 169, 224, 0.3)) drop-shadow(0 0 4px rgba(0, 169, 224, 0.5));
+                filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 8px rgba(0, 169, 224, 0.4));
             }
 
             50% {
-                filter: brightness(0) invert(1) drop-shadow(0 0 25px rgba(0, 169, 224, 0.6)) drop-shadow(0 0 10px rgba(0, 169, 224, 0.7));
+                filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 16px rgba(0, 169, 224, 0.7));
             }
         }
 

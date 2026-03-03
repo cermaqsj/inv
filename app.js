@@ -115,7 +115,7 @@ async function checkConnection() {
         console.log("No Local Data Available");
     }
 
-    updateStatus('offline', `Base Local (${allProductsCache.length} prod)`);
+    updateStatus('offline', `Offline (${allProductsCache.length})`);
 
     // Process queue on connect
     if (navigator.onLine) processQueue();
@@ -153,14 +153,14 @@ async function checkConnection() {
         updatePendingBadge(pending.length);
 
         const source = (localDB.length > 0) ? 'API + Static' : 'API Full';
-        updateStatus('online', `En Linea (${allProductsCache.length})`);
+        updateStatus('online', `Sheets: Online`);
         return true;
     } catch (error) {
         console.error(error);
         const errorMsg = error.message || "Error desconocido";
         // If we failed but have data, we are good
         if (allProductsCache.length > 0) {
-            updateStatus('offline', `Offline (${allProductsCache.length})`);
+            updateStatus('offline', `Sheets: Offline`);
             showToast(`Offline: ${errorMsg}`, 'warning');
         } else {
             updateStatus('offline', 'Modo Offline');
