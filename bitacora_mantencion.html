@@ -24,77 +24,156 @@
 
     <style>
         /* =============================================
-           BITÁCORA — MINIMAL ELEGANT OVERRIDE
+           BITÁCORA — PREMIUM MINIMAL OVERRIDE v2
         ============================================= */
+
+        /* ---------- LOCAL PALETTE (sober & refined) ---------- */
+        :root {
+            --bit-nav-bg: rgba(10, 12, 18, 0.96);
+            --bit-border: rgba(255, 255, 255, 0.07);
+            --bit-accent: #e2e8f0;
+            /* pearl white */
+            --bit-accent-dim: rgba(226, 232, 240, 0.5);
+            --bit-pill-bg: rgba(255, 255, 255, 0.055);
+            --bit-pill-hover: rgba(255, 255, 255, 0.10);
+            --bit-step-ring: #475569;
+            /* slate-600 */
+            --bit-step-active: #e2e8f0;
+            --bit-input-bg: rgba(255, 255, 255, 0.04);
+            --bit-input-border: rgba(255, 255, 255, 0.1);
+            --bit-btn-primary: #e2e8f0;
+            --bit-btn-primary-text: #0a0c12;
+        }
+
+        [data-theme="light"] {
+            --bit-nav-bg: rgba(255, 255, 255, 0.92);
+            --bit-border: rgba(0, 0, 0, 0.07);
+            --bit-accent: #0f172a;
+            --bit-accent-dim: rgba(15, 23, 42, 0.4);
+            --bit-pill-bg: rgba(0, 0, 0, 0.04);
+            --bit-pill-hover: rgba(0, 0, 0, 0.08);
+            --bit-step-ring: #94a3b8;
+            --bit-step-active: #0f172a;
+            --bit-input-bg: #ffffff;
+            --bit-input-border: #e2e8f0;
+            --bit-btn-primary: #0f172a;
+            --bit-btn-primary-text: #ffffff;
+        }
 
         /* ---------- NAV ---------- */
         .bit-nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.9rem 1.4rem;
+            padding: 1rem 1.4rem;
             position: sticky;
             top: 0;
             z-index: 50;
-            background: var(--nav-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            background: var(--bit-nav-bg);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border-bottom: 1px solid var(--bit-border);
+            box-shadow: 0 1px 0 var(--bit-border), 0 4px 24px rgba(0, 0, 0, 0.4);
         }
 
+        /* Brand */
         .bit-nav-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
         }
 
         .bit-nav-logo {
-            height: 30px;
+            height: 36px;
             width: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1);
-            opacity: 0.9;
+            filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(255, 255, 255, 0.18));
+            transition: filter 0.3s;
         }
 
         [data-theme="light"] .bit-nav-logo {
-            filter: none;
+            filter: none drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
         }
 
-        .bit-nav-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 2px;
+        .bit-nav-divider {
+            width: 1px;
+            height: 22px;
+            background: var(--bit-border);
+            border-radius: 1px;
+        }
+
+        .bit-nav-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .bit-nav-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--bit-accent);
+            line-height: 1;
+        }
+
+        .bit-nav-sub {
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--bit-accent-dim);
+            line-height: 1;
         }
 
+        /* Action pills */
         .bit-nav-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            align-items: center;
         }
 
         .bit-icon-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid var(--glass-border);
-            background: transparent;
+            height: 34px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid var(--bit-border);
+            background: var(--bit-pill-bg);
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 5px;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: var(--text-muted);
+            color: var(--bit-accent-dim);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .bit-icon-btn:hover {
-            background: var(--btn-hover-bg);
-            color: var(--text-main);
-            border-color: var(--btn-hover-border);
+            background: var(--bit-pill-hover);
+            color: var(--bit-accent);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        [data-theme="light"] .bit-icon-btn:hover {
+            border-color: rgba(0, 0, 0, 0.15);
         }
 
         .bit-icon-btn .material-icons-round {
-            font-size: 20px;
+            font-size: 16px;
+        }
+
+        /* hide labels on very small screens */
+        .bit-btn-label {
+            display: none;
+        }
+
+        @media (min-width: 380px) {
+            .bit-btn-label {
+                display: inline;
+            }
         }
 
         /* ---------- MAIN LAYOUT ---------- */
@@ -514,17 +593,23 @@
     <nav class="bit-nav" style="border-radius:0;">
         <div class="bit-nav-brand">
             <img src="Cermaq_logo2.png" alt="Cermaq" class="bit-nav-logo">
-            <span class="bit-nav-label">Bitácora</span>
+            <div class="bit-nav-divider"></div>
+            <div class="bit-nav-meta">
+                <span class="bit-nav-title">Bitácora</span>
+                <span class="bit-nav-sub">Mantención</span>
+            </div>
         </div>
         <div class="bit-nav-actions">
             <button class="bit-icon-btn" onclick="openSheet()" title="Abrir Planilla">
-                <span class="material-icons-round" style="color: #10b981;">table_view</span>
+                <span class="material-icons-round">table_view</span>
+                <span class="bit-btn-label">Planilla</span>
             </button>
             <button class="bit-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema">
                 <span class="material-icons-round">dark_mode</span>
             </button>
             <button class="bit-icon-btn" onclick="window.location.href='index.html'" title="Volver">
                 <span class="material-icons-round">arrow_back</span>
+                <span class="bit-btn-label">Volver</span>
             </button>
         </div>
     </nav>
