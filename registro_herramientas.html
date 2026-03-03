@@ -7,17 +7,19 @@
     <title>Bitácora Herramientas - Cermaq</title>
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
     <!-- Local Styles -->
-    <link rel="stylesheet" href="cermaq-style.css?v=9.11">
+    <link rel="stylesheet" href="cermaq-style.css?v=11.1-ULTRA">
 
     <!-- PWA & Mobile -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="Q.png">
+    <meta name="apple-mobile-web-app-title" content="Herramientas">
+    <link rel="apple-touch-icon" href="cermaq_logo.png">
+    <link rel="icon" type="image/png" href="cermaq_logo.png">
 
     <script src="registro_herramientas.js?v=1.0" defer></script>
 </head>
@@ -28,21 +30,16 @@
         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.8;"></canvas>
 
     <nav>
-        <div style="text-align: center;">
+        <div class="nav-brand">
             <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo">
-            <div
-                style="font-size: 0.7rem; color: var(--accent); font-weight: 700; letter-spacing: 1px; margin-top: 4px; text-transform: uppercase;">
-                BITÁCORA HERRAMIENTAS
-            </div>
+            <div class="nav-title" style="color: #ef4444 !important;">BITÁCORA HERRAMIENTAS</div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 5px;">
-            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle"
-                style="border: 1px solid var(--glass-border); border-radius: 50%;">
+        <div class="nav-actions">
+            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema">
                 <span class="material-icons-round">dark_mode</span>
             </button>
-            <button class="icon-btn" onclick="window.location.href='index.html'"
-                style="border: 1px solid var(--glass-border); border-radius: 50%;" title="Volver al Inventario">
+            <button class="icon-btn" onclick="window.location.href='index.html'" title="Volver al Inventario">
                 <span class="material-icons-round">inventory_2</span>
             </button>
         </div>
@@ -58,45 +55,46 @@
         });
     </script>
 
-    <main style="padding-bottom: 80px;">
+    <main style="padding-bottom: 80px; max-width: 500px; margin: 0 auto; width: 100%;">
         <div class="product-header"
-            style="display: flex; justify-content: center; align-items: center; margin-bottom: 1rem;">
-            <h2 style="display:block; font-size: 1.3rem; margin:0;">Control Herramientas</h2>
+            style="display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="display:block; font-size: 1.4rem; font-weight: 600; margin:0; letter-spacing: 0.5px;">Control de
+                Préstamos</h2>
         </div>
 
-        <!-- Tabs -->
+        <!-- Premium Tabs -->
         <div
-            style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+            style="display: flex; gap: 12px; margin-bottom: 2rem; background: rgba(0,0,0,0.1); padding: 6px; border-radius: 24px; border: 1px solid var(--glass-border);">
             <button class="btn btn-secondary" id="tab-loan" onclick="switchToolTab('loan')"
-                style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PRÉSTAMO</button>
+                style="flex: 1; padding: 0.8rem; font-size: 0.9rem; font-weight: 600; border: none; box-shadow: none; border-radius: 18px;">PRÉSTAMO</button>
             <button class="btn btn-secondary" id="tab-active" onclick="switchToolTab('active')"
-                style="flex: 1; padding: 1rem; font-size: 1rem; font-weight: bold; height: auto;">PENDIENTE</button>
+                style="flex: 1; padding: 0.8rem; font-size: 0.9rem; font-weight: 600; border: none; box-shadow: none; border-radius: 18px; opacity: 0.6; background: transparent;">PENDIENTE</button>
         </div>
 
         <!-- Tab: Loan (Form) -->
-        <div id="view-tool-loan" style="flex: 1;">
-            <div class="card" style="margin-bottom: 1rem;">
+        <div id="view-tool-loan" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="card">
                 <div class="input-group">
                     <label class="input-label">Trabajador / Responsable</label>
                     <input type="text" id="tool-worker" class="input-field" placeholder="Nombre completo">
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom: 1rem;">
+            <div class="card">
                 <div class="input-group">
                     <label class="input-label">Área</label>
                     <input type="text" id="tool-area" class="input-field" placeholder="Ej. Smolt">
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom: 1rem;">
+            <div class="card">
                 <div class="input-group">
                     <label class="input-label">Herramienta / Insumo</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="tool-name" class="input-field"
-                            placeholder="Ej. Pistola de Impacto DeWALT" style="flex: 1;">
-                        <button class="btn btn-secondary" onclick="addToolToBatch()"
-                            style="width: 50px; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--primary); color: white; border: none;">
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="tool-name" class="input-field" placeholder="Ej. Pistola de Impacto"
+                            style="flex: 1;">
+                        <button class="btn btn-primary" onclick="addToolToBatch()"
+                            style="width: 50px; height: 50px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 16px;">
                             <span class="material-icons-round">add</span>
                         </button>
                     </div>
@@ -106,7 +104,7 @@
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom: 1rem;">
+            <div class="card">
                 <div class="input-group">
                     <label class="input-label">Comentario (Opcional)</label>
                     <input type="text" id="tool-comment" class="input-field" placeholder="Detalle estado o motivo">
@@ -114,15 +112,20 @@
             </div>
 
             <button class="btn btn-primary" id="btn-tool-submit" onclick="registerToolOut()"
-                style="width: 100%; margin-top: 1rem; padding: 1.2rem; font-size: 1.1rem; font-weight: bold;">
+                style="width: 100%; margin-top: 1rem; padding: 1.2rem; font-size: 1rem; font-weight: bold; box-shadow: 0 10px 25px rgba(0, 169, 224, 0.4);">
                 <span class="material-icons-round">output</span> REGISTRAR SALIDA
             </button>
         </div>
 
         <!-- Tab: Active & History (List) -->
-        <div id="view-tool-active" style="display: none; flex: 1;">
-            <div id="tool-list-container" class="cart-list">
-                <div style="text-align: center; color: var(--text-light); padding: 2rem;">Cargando...</div>
+        <div id="view-tool-active" style="display: none; flex: 1; flex-direction: column; gap: 1rem;">
+            <div id="tool-list-container" class="cart-list"
+                style="background: rgba(0,0,0,0.2); border-radius: 20px; padding: 1rem; border: 1px solid var(--glass-border);">
+                <div style="text-align: center; color: var(--text-muted); padding: 3rem 1rem; font-weight: 500;">
+                    <span class="material-icons-round"
+                        style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem; display: block;">hourglass_empty</span>
+                    Cargando Préstamos...
+                </div>
             </div>
         </div>
     </main>

@@ -8,7 +8,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "Q.png",
+      "src": "cermaq_logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
