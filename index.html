@@ -201,25 +201,154 @@
         })();
     </script>
 
-    <nav style="flex-wrap: nowrap; padding: 0.8rem 1rem;">
-        <div class="nav-brand" style="flex: 1; min-width: 0;">
-            <img src="Cermaq_logo2.png" alt="Logo" class="nav-logo" style="flex-shrink: 0;">
-            <div class="nav-title"
-                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem;">BODEGA STA
-                JUANA</div>
+    <style>
+        /* =============================================
+           BODEGA HERO BANNER (Corporate Premium)
+        ============================================= */
+        .bodega-hero {
+            position: relative;
+            width: 100%;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.8rem 1.4rem 2.2rem;
+            /* good breathing room */
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            /* crisp edge */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            z-index: 50;
+        }
+
+        /* Light beam effect from top down */
+        .bodega-hero-beam {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 300px;
+            background: radial-gradient(ellipse at 50% 0%,
+                    rgba(0, 169, 224, 0.18) 0%,
+                    /* Cermaq Cyan */
+                    rgba(0, 169, 224, 0.04) 45%,
+                    transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bodega-hero-body {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            /* Space between logo and text */
+        }
+
+        /* Pure white logo with Cermaq Cyan glow */
+        .bodega-hero-logo {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(0, 169, 224, 0.4)) drop-shadow(0 0 8px rgba(0, 169, 224, 0.6));
+            animation: bodega-logo-glow 4s ease-in-out infinite;
+            margin-bottom: 4px;
+        }
+
+        @keyframes bodega-logo-glow {
+
+            0%,
+            100% {
+                filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(0, 169, 224, 0.3)) drop-shadow(0 0 4px rgba(0, 169, 224, 0.5));
+            }
+
+            50% {
+                filter: brightness(0) invert(1) drop-shadow(0 0 25px rgba(0, 169, 224, 0.6)) drop-shadow(0 0 10px rgba(0, 169, 224, 0.7));
+            }
+        }
+
+        .bodega-hero-title {
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 0.28em;
+            /* Extremely wide elegant tracking */
+            text-transform: uppercase;
+            color: #fff;
+            opacity: 0.9;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* Action buttons pinned to top right ALWAYS horizontal */
+        .bodega-hero-actions {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 3;
+            display: flex;
+            flex-direction: row !important;
+            /* Forces horizontal forever */
+            flex-wrap: nowrap !important;
+            gap: 8px;
+        }
+
+        /* Sleek frosty dark buttons */
+        .bodega-icon-btn {
+            height: 36px;
+            width: 36px;
+            padding: 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            /* Fixed white color regardless of index.html theme! */
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .bodega-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff !important;
+            border-color: rgba(0, 169, 224, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 169, 224, 0.25);
+        }
+
+        .bodega-icon-btn .material-icons-round {
+            font-size: 18px;
+            color: inherit !important;
+        }
+    </style>
+
+    <header class="bodega-hero">
+        <div class="bodega-hero-beam"></div>
+
+        <div class="bodega-hero-actions">
+            <!-- Theme toggle now clearly visible regardless of background -->
+            <button class="bodega-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema">
+                <span class="material-icons-round">dark_mode</span>
+            </button>
+            <button class="bodega-icon-btn" id="btn-admin-login" onclick="toggleAdmin()" title="Acceso Admin">
+                <span class="material-icons-round">admin_panel_settings</span>
+            </button>
         </div>
 
-        <div class="nav-actions" style="flex-shrink: 0; gap: 8px;">
-            <button class="icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar Tema"
-                style="width: 38px; height: 38px;">
-                <span class="material-icons-round" style="font-size: 20px;">dark_mode</span>
-            </button>
-            <button class="icon-btn" id="btn-admin-login" onclick="toggleAdmin()" title="Acceso Admin"
-                style="width: 38px; height: 38px;">
-                <span class="material-icons-round" style="font-size: 20px;">admin_panel_settings</span>
-            </button>
+        <div class="bodega-hero-body">
+            <img src="Cermaq_logo2.png" alt="Cermaq" class="bodega-hero-logo">
+            <h1 class="bodega-hero-title">Bodega Sta Juana</h1>
         </div>
-    </nav>
+    </header>
 
     <!-- Theme Init -->
     <script>
